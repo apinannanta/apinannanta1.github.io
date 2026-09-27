@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PKP Device Check | ระบบตรวจสอบอุปกรณ์การเรียนการสอน — ปากคาดพิทยาคม</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Noto+Serif+Thai:wght@600;700&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pri:#38BDF8;--pri-d:#0EA5E9;--ind:#818CF8;--bg:#05070D;--line:rgba(148,163,196,.16);--text:#E8ECFA;--mut:#8B93B4;--ok:#22C55E;--warn:#F59E0B;--bad:#F43F5E;--teal:#2DD4BF;--ok-s:rgba(34,197,94,.12);--bad-s:rgba(244,63,94,.12);--warn-s:rgba(245,158,11,.12);--pri-s:rgba(56,189,248,.12);--r:14px;--hh:64px;--sh:0 1px 2px rgba(0,0,0,.3),0 12px 32px -12px rgba(2,6,23,.6);
+--panel:linear-gradient(180deg,rgba(148,168,255,.07),rgba(148,168,255,.03));--brd:rgba(148,168,255,.14);--glow-pri:0 0 0 1px rgba(56,189,248,.16),0 0 24px -4px rgba(56,189,248,.35);--glow-viol:0 0 0 1px rgba(139,92,246,.18),0 0 24px -6px rgba(139,92,246,.4)}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(var(--hh) + 70px)}
+body{margin:0;font:14px/1.5 Sarabun,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+[hidden],.hidden{display:none!important}
+.text-center{text-align:center}.text-gray-500,.mut{color:var(--mut)}.text-red-600{color:var(--bad)}.p-8{padding:32px}.py-4{padding:16px 0}.text-sm{font-size:14px}.text-xs{font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none;display:inline-block;box-shadow:0 0 8px 1px var(--ok);animation:dotPulse 2.4s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ---------- ambient background ---------- */
+#bgFx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:
+ radial-gradient(1100px 700px at 14% -8%,rgba(56,189,248,.16),transparent 60%),
+ radial-gradient(900px 600px at 108% 12%,rgba(139,92,246,.14),transparent 55%),
+ linear-gradient(180deg,#050710 0%,#070A14 45%,#05070D 100%)}
+.bgFx-grid{position:absolute;inset:-1px;background-image:linear-gradient(rgba(148,168,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,168,255,.05) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(1200px 800px at 30% 0%,#000 40%,transparent 85%)}
+.bgFx-glow{position:absolute;border-radius:50%;filter:blur(80px);opacity:.55}
+.bgFx-glow-1{width:520px;height:520px;top:-140px;left:18%;background:radial-gradient(circle,rgba(56,189,248,.5),transparent 70%)}
+.bgFx-glow-2{width:460px;height:460px;top:20%;right:-120px;background:radial-gradient(circle,rgba(139,92,246,.42),transparent 70%)}
+.bgFx-glow-3{width:380px;height:380px;bottom:-140px;left:38%;background:radial-gradient(circle,rgba(34,211,238,.3),transparent 70%)}
+.bgFx-noise{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@media(max-width:1023px){.bgFx-glow-2{display:none}}
+
+.app{display:grid;grid-template-columns:266px minmax(0,1fr);position:relative;z-index:1}
+.side{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,rgba(10,14,26,.92),rgba(6,9,17,.96));backdrop-filter:blur(20px);border-right:1px solid var(--brd);display:flex;flex-direction:column;padding:20px 14px;z-index:70}
+.brand{display:flex;gap:10px;align-items:center;padding:0 6px 18px;margin-bottom:6px;border-bottom:1px solid var(--brd)}
+.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--pri),var(--ind));color:#05070D;display:grid;place-items:center;flex:none;box-shadow:var(--glow-pri)}
+.brand b{display:block;font:600 15px 'Chakra Petch',Sarabun,sans-serif;letter-spacing:.02em;line-height:1.2;color:#fff}.brand small{color:var(--mut);font-size:11.5px;line-height:1.3;display:block;margin-top:1px}
+.nav a{position:relative;display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:#AEB8DA;text-decoration:none;font-weight:500;margin-bottom:2px;cursor:pointer;transition:background .15s,color .15s}
+.nav a svg{opacity:.85;transition:opacity .15s}
+.nav a:hover{background:rgba(148,168,255,.08);color:#fff}
+.nav a[aria-current=true]{background:linear-gradient(90deg,rgba(56,189,248,.16),rgba(99,102,241,.08));color:#fff;font-weight:600}
+.nav a[aria-current=true]::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--pri),var(--ind));box-shadow:0 0 10px 1px var(--pri)}
+.nav a[aria-current=true] svg{opacity:1;color:var(--pri)}
+.side-foot{margin-top:auto;border-top:1px solid var(--brd);padding:14px 6px 0;font-size:12.5px;font-weight:600;color:#C6CCE6}
+.side-foot div{display:flex;gap:6px;align-items:center;color:var(--mut);font-size:11.5px;font-weight:400;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;height:var(--hh);background:rgba(8,11,20,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px;padding:0 24px}
+.top h2{margin:0;font-size:17px;font-weight:700;line-height:1.2;color:#fff}.crumb{font-size:12px;color:var(--mut)}.sp{flex:1}
+.chip{display:inline-flex;gap:6px;align-items:center;height:34px;padding:0 12px;border:1px solid var(--brd);border-radius:10px;background:rgba(148,168,255,.06);font-size:13px;font-weight:600;white-space:nowrap;color:#DCE1F5}
+.chip svg{width:16px;height:16px;color:var(--pri)}.chip.auto{font-weight:500;color:#AEB8DA}
+.auto[data-s=saving] .dot{background:var(--warn);box-shadow:0 0 8px 1px var(--warn)}.auto[data-s=idle] .dot{background:#5B6484;box-shadow:none;animation:none}.auto[data-s=err] .dot{background:var(--bad);box-shadow:0 0 8px 1px var(--bad)}
+.x{width:36px;height:36px;border:0;background:0;border-radius:8px;cursor:pointer;color:var(--mut);display:grid;place-items:center;flex:none}.x:hover{background:rgba(148,168,255,.1);color:#fff}
+#menuBtn{display:none}
+.wrap{padding:24px;max-width:1720px;display:grid;gap:20px;position:relative;z-index:1}
+.card{background:var(--panel);border:1px solid var(--brd);border-radius:var(--r);box-shadow:var(--sh);backdrop-filter:blur(16px)}
+.card>h3{margin:0;font:700 14.5px 'Chakra Petch',Sarabun,sans-serif;letter-spacing:.02em;display:flex;gap:8px;align-items:center;padding:15px 20px;border-bottom:1px solid var(--brd);color:#fff}
+.card>h3 svg{color:var(--pri)}.cb{padding:20px}
+
+/* ---------- hero ---------- */
+.hero{display:flex;gap:22px;align-items:center;justify-content:space-between;padding:22px 24px;flex-wrap:wrap}
+.hero-main{display:flex;gap:16px;align-items:center}
+.hero .ic{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(139,92,246,.18));color:var(--pri);display:grid;place-items:center;flex:none;box-shadow:var(--glow-pri)}.hero .ic svg{width:28px;height:28px}
+.hero-eyebrow{display:block;font:600 11.5px 'Chakra Petch',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--pri);margin-bottom:4px}
+.hero h1{font:700 24px/1.35 'Noto Serif Thai',Sarabun,serif;margin:0;color:#fff}.hero p{margin:4px 0 0;color:var(--mut)}
+.hero-visual{display:flex;gap:14px;align-items:center}
+.hv-ring{--p:0;width:104px;height:104px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--pri) calc(var(--p)*1%),rgba(148,168,255,.12) 0);box-shadow:0 0 30px -6px rgba(56,189,248,.5);animation:ringSpin 12s linear infinite;transition:background 1s}
+.hv-ring-inner{width:82px;height:82px;border-radius:50%;background:#070A14;display:grid;place-items:center;text-align:center;line-height:1.1;animation:ringSpin 12s linear infinite reverse}
+.hv-ring-inner b{font:700 18px 'Chakra Petch',sans-serif;color:#fff}.hv-ring-inner small{font-size:8.5px;letter-spacing:.08em;color:var(--mut)}
+@keyframes ringSpin{to{transform:rotate(1turn)}}
+.hv-card{background:var(--panel);border:1px solid var(--brd);border-radius:12px;padding:10px 16px;text-align:center;min-width:112px}
+.hv-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px 1px var(--ok);margin-bottom:5px;animation:dotPulse 2s ease-in-out infinite}
+.hv-card b{display:block;font:700 13px 'Chakra Petch',sans-serif;letter-spacing:.03em;color:#fff}.hv-card small{font-size:9.5px;letter-spacing:.06em;color:var(--mut)}
+@media(max-width:1023px){.hero-visual{display:none}}
+
+.grid{display:grid;gap:16px 20px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.fl{display:block;font-weight:600;font-size:13px;margin-bottom:6px;color:#C6CCE6}.fl i{color:var(--bad);font-style:normal}
+.field{width:100%;height:40px;padding:0 12px;border:1px solid rgba(148,168,255,.18);border-radius:10px;background:rgba(6,9,18,.55);font:inherit;color:var(--text);transition:border-color .15s,box-shadow .15s}
+.field::placeholder{color:#5B6484}
+.field:hover{border-color:rgba(148,168,255,.34)}.field:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 3px rgba(56,189,248,.18)}
+select.field{color-scheme:dark}
+textarea.field{height:auto;padding:10px 12px;resize:vertical}
+.field-missing{border-color:var(--bad)!important;box-shadow:0 0 0 3px rgba(244,63,94,.18)!important}
+.sw{position:relative}.sw>svg{position:absolute;left:12px;top:11px;color:var(--mut);pointer-events:none}.sw .field{padding-left:38px;padding-right:38px}
+.sw button{position:absolute;right:6px;top:6px;width:28px;height:28px;border:0;background:0;border-radius:8px;color:var(--mut);cursor:pointer;display:none;place-items:center}.sw.has button{display:grid}.sw button:hover{background:rgba(148,168,255,.12);color:#fff}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--brd);background:rgba(148,168,255,.06);color:#DCE1F5;font:600 14px Sarabun,sans-serif;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:rgba(148,168,255,.13);border-color:rgba(148,168,255,.3)}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--pri),var(--ind));border-color:transparent;color:#04101C;box-shadow:var(--glow-pri)}.btn-primary:hover{filter:brightness(1.08);box-shadow:0 0 0 1px rgba(56,189,248,.3),0 0 30px -2px rgba(56,189,248,.55)}
+.btn-primary.danger-fill{background:linear-gradient(135deg,#F43F5E,#DC2626);color:#fff;box-shadow:0 0 0 1px rgba(244,63,94,.3),0 0 24px -4px rgba(244,63,94,.55)}
+.btn-lg{height:44px;padding:0 22px;font-size:14.5px}.btn-sm{height:30px;padding:0 10px;font-size:12.5px;border-radius:8px;gap:5px}
+.btn-danger{color:#FCA5A5;border-color:rgba(244,63,94,.35)}.btn-danger:hover{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.55)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px 20px;border-top:1px solid var(--brd)}
+.bar .sep{width:1px;height:24px;background:var(--brd);margin:0 4px}
+.menu{position:relative;margin-left:auto}
+.pop{position:fixed;min-width:270px;background:#0A0E1B;border:1px solid var(--brd);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.55);padding:6px;z-index:40}
+.pop .btn{width:100%;justify-content:flex-start;border:0;font-weight:500;background:transparent}.pop .btn:hover{background:rgba(148,168,255,.1)}
+
+/* ---------- dashboard summary ---------- */
+.two{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+.stats{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{position:relative;padding:18px 20px;border-right:1px solid var(--brd);overflow:hidden}.stat:last-child{border:0}.stat span{color:var(--mut);font-size:12.5px}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px}
+.stat--total::before{background:var(--pri)}.stat--pass::before{background:var(--ok)}.stat--fail::before{background:var(--bad)}.stat--pending::before{background:var(--warn)}
+.stat b{display:block;font:700 32px/1.2 'Chakra Petch',sans-serif;font-variant-numeric:tabular-nums;color:#fff;margin-top:2px}
+.stat--pass b{text-shadow:0 0 18px rgba(34,197,94,.45)}.stat--fail b{text-shadow:0 0 18px rgba(244,63,94,.45)}.stat--pending b{text-shadow:0 0 18px rgba(245,158,11,.4)}
+.pg{padding:16px 20px;border-top:1px solid var(--brd)}.pg-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:600;color:#DCE1F5}
+.track{height:9px;background:rgba(148,168,255,.1);border-radius:99px;overflow:hidden;flex:1 1 160px;min-width:100px}.pg .track{margin:8px 0}
+.fill{height:100%;background:linear-gradient(90deg,var(--pri),var(--ind));border-radius:99px;width:0;transition:width .35s;box-shadow:0 0 10px 0 rgba(56,189,248,.6)}.is-complete .fill,.pg.done .fill{background:linear-gradient(90deg,var(--ok),#4ADE80);box-shadow:0 0 10px 0 rgba(34,197,94,.6)}
+.ex{height:auto;padding:14px;justify-content:flex-start;text-align:left;width:100%;margin-bottom:8px;white-space:normal}.ex svg{color:var(--pri);width:22px;height:22px}
+.ex b{display:block;color:#fff}.ex small{color:var(--mut);font-weight:400;font-size:12.5px}
+.insp{display:grid;gap:12px;align-content:start}
+.strip{position:sticky;top:calc(var(--hh) + env(safe-area-inset-top,0px));z-index:30;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;padding:11px 16px;background:rgba(8,11,20,.85);backdrop-filter:blur(16px);border:1px solid var(--brd);border-radius:var(--r);box-shadow:var(--sh)}
+.strip .k{color:var(--mut);margin-right:4px}.pill{padding:3px 11px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.02em;background:var(--warn-s);color:var(--warn);border:1px solid rgba(245,158,11,.3)}
+.pill[data-s=done]{background:var(--ok-s);color:var(--ok);border-color:rgba(34,197,94,.3)}.pill[data-s=idle]{background:rgba(148,168,255,.08);color:var(--mut);border-color:var(--brd)}.is-complete #sbRemain{display:none}
+#sbPercent{min-width:40px;text-align:right;font:700 14px 'Chakra Petch',sans-serif;color:#fff}
+#reportArea{display:grid;gap:20px}.tcard{overflow:hidden}
+
+/* ---------- inspection matrix ---------- */
+.tool{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:14px 20px;border-bottom:1px solid var(--brd)}
+.tool label{font-weight:600;font-size:13px;display:flex;gap:8px;align-items:center;color:#C6CCE6}.tool .field{width:auto;min-width:170px}
+.tool .model{margin-left:auto;color:var(--mut);font-size:13px}.tool .model b{color:#fff}
+.tscroll{overflow:auto;max-height:calc(100vh - 170px);min-height:320px}
+.tscroll::-webkit-scrollbar{height:10px;width:10px}.tscroll::-webkit-scrollbar-thumb{background:rgba(148,168,255,.25);border-radius:99px}
+#inspectionTable{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
+#inspectionTable th,#inspectionTable td{border-right:1px solid var(--brd);border-bottom:1px solid var(--brd)}
+#inspectionTable thead th{position:sticky;background:#0B0F1D;color:#AEB8DA;font-weight:600;z-index:5;padding:6px 4px;line-height:1.3;font-size:11.5px}
+thead tr:first-child th{top:0;height:36px;font:700 12px 'Chakra Petch',sans-serif;letter-spacing:.03em;color:#fff;border-right-color:rgba(255,255,255,.14)}
+thead tr:nth-child(2) th{top:36px;height:84px;box-shadow:0 1px 0 var(--brd)}
+.g1{background:#111528!important}.g2{background:linear-gradient(180deg,#0C3A57,#0B2E47)!important}.g3{background:linear-gradient(180deg,#0B4A46,#0A3B38)!important}.g4{background:linear-gradient(180deg,#2E2270,#241B59)!important}.g5{background:#1B2140!important}
+.g2,.g3,.g4,.g5{border-left:2px solid rgba(255,255,255,.16)}.gs{left:0;z-index:9!important}.prt{display:none}
+th.sticky-col,td.sticky-col{position:sticky}th.sticky-col{z-index:9!important}td.sticky-col{z-index:4}
+.sticky-col-1{left:0;min-width:52px;max-width:52px;text-align:center}.sticky-col-2{left:52px;min-width:230px;box-shadow:1px 0 0 var(--brd),6px 0 10px -6px rgba(0,0,0,.5)}
+.c2{min-width:92px}.c3{min-width:78px}.c4{min-width:98px}
+#tableBody tr{height:48px;--bg:#0A0E1B}#tableBody tr:nth-child(even){--bg:#0D1120}
+#tableBody tr.row-pass{--bg:rgba(34,197,94,.09)}#tableBody tr.row-fail{--bg:rgba(244,63,94,.1)}
+#tableBody tr.row-fail td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
+#tableBody tr:hover{--bg:rgba(56,189,248,.09)}#tableBody tr.row-pass:hover{--bg:rgba(34,197,94,.16)}#tableBody tr.row-fail:hover{--bg:rgba(244,63,94,.17)}
+#tableBody td{background:var(--bg);padding:0 8px;height:48px;color:#DCE1F5}
+#tableBody tr:focus-within td:first-child{box-shadow:inset 3px 0 0 var(--pri)}
+#tableBody td:nth-child(1){text-align:center;color:var(--mut)}#tableBody td:nth-child(2){font-weight:600;white-space:nowrap;color:#fff}
+#tableBody td:nth-child(3) .field{min-width:130px}#tableBody td:nth-child(22) .field{min-width:200px}
+#tableBody .field{height:32px;font-size:13px;padding:0 8px!important;border-radius:8px}
+#inspectionTable tbody td:nth-child(4),#inspectionTable tbody td:nth-child(14),#inspectionTable tbody td:nth-child(20),#inspectionTable tbody td:nth-child(22),
+#inspectionTable thead tr:nth-child(2) th:nth-child(4),#inspectionTable thead tr:nth-child(2) th:nth-child(14),#inspectionTable thead tr:nth-child(2) th:nth-child(20),#inspectionTable thead tr:nth-child(2) th:nth-child(22){border-left:2px solid rgba(148,168,255,.3)}
+#tableBody td.tick-cell{padding:0;text-align:center;cursor:pointer}
+#tableBody td.tick-cell label{position:relative;display:flex;align-items:center;justify-content:center;height:47px;cursor:pointer}
+#tableBody td.tick-cell input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+#tableBody td.tick-cell:hover{background:rgba(56,189,248,.16)}#tableBody td.tick-cell:has(input:checked){background:rgba(34,197,94,.14)}
+#tableBody td.tick-cell:has(input:focus-visible){outline:2px solid var(--pri);outline-offset:-2px}
+#tableBody td.tick-cell label::before{content:"";width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(148,168,255,.35);background:rgba(6,9,18,.6);transition:.12s}
+#tableBody td.tick-cell label:has(input:checked)::before{background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--ok);box-shadow:0 0 10px -1px rgba(34,197,94,.7)}
+#tableBody td.tick-pass,#tableBody td.tick-fail{background:var(--bg)!important}
+#tableBody td.tick-pass label::before,#tableBody td.tick-fail label::before{display:none}
+#tableBody td.tick-pass label::after,#tableBody td.tick-fail label::after{height:30px;min-width:76px;padding:0 10px;border:1px solid rgba(148,168,255,.25);border-radius:8px;background:rgba(148,168,255,.06);color:var(--mut);font-weight:700;font-size:12.5px;letter-spacing:.02em;display:inline-flex;align-items:center;justify-content:center;transition:.12s}
+#tableBody td.tick-pass label::after{content:"✓ READY"}#tableBody td.tick-fail label::after{content:"✕ ISSUE"}
+#tableBody td.tick-pass label:hover::after{border-color:var(--ok);color:var(--ok)}#tableBody td.tick-fail label:hover::after{border-color:var(--bad);color:var(--bad)}
+#tableBody td.tick-pass label:has(input:checked)::after{background:linear-gradient(135deg,var(--ok),#16A34A);border-color:transparent;color:#04160B;box-shadow:0 0 12px -1px rgba(34,197,94,.7)}
+#tableBody td.tick-fail label:has(input:checked)::after{background:linear-gradient(135deg,var(--bad),#DC2626);border-color:transparent;color:#fff;box-shadow:0 0 12px -1px rgba(244,63,94,.7)}
+.ra{display:flex;gap:6px;padding:0 6px}
+.note .cb{display:grid;gap:8px}.note small{color:var(--mut)}
+.sig{display:grid;grid-template-columns:1fr 1fr;gap:20px}.sig .card{padding:20px;text-align:center}
+.sig h4{margin:0 0 8px;text-align:left;font:700 13.5px 'Chakra Petch',sans-serif;letter-spacing:.02em;color:#fff}.sig .line{border-bottom:1px dotted rgba(148,168,255,.4);height:48px;text-align:left;color:var(--mut);padding-top:24px}
+.sig p{margin:6px 0 0;color:#DCE1F5}
+
+/* ---------- modals ---------- */
+.modal-back{position:fixed;inset:0;background:rgba(2,4,10,.72);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:90;padding:16px}.modal-back.show{display:flex}
+.modal-box{background:#0A0E1B;border:1px solid var(--brd);border-radius:16px;width:100%;max-width:540px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6),var(--glow-viol);animation:pop .18s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--brd)}
+.modal-head h3{margin:0;font:700 16.5px 'Chakra Petch',sans-serif;color:#fff}.modal-head small{color:var(--mut)}
+.modal-body{padding:18px 20px;overflow:auto;color:#DCE1F5}.modal-foot{padding:14px 20px;border-top:1px solid var(--brd);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.drawer{justify-content:flex-end;padding:0}.drawer .modal-box{max-width:520px;height:100%;max-height:none;border-radius:16px 0 0 16px;animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+.student-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--brd)}.student-row .no{width:30px;text-align:right;color:var(--mut)}
+.icon-btn{width:34px;height:34px;flex:none;border:1px solid var(--brd);background:rgba(148,168,255,.06);border-radius:8px;cursor:pointer;display:grid;place-items:center;color:#C6CCE6}
+.icon-btn:hover{background:rgba(148,168,255,.14);color:#fff}.icon-btn.del{color:#FCA5A5;border-color:rgba(244,63,94,.35)}.icon-btn.del:hover{background:rgba(244,63,94,.14)}
+.lvl{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;margin-bottom:10px;border:1px solid var(--brd);border-left-width:4px;border-radius:12px;background:rgba(148,168,255,.04);cursor:pointer;font:inherit;color:inherit}
+.lvl:hover{background:rgba(148,168,255,.1)}.lvl b{display:block;color:#fff}.lvl small{color:var(--mut);font-size:13px}.lvl svg{margin-top:2px}
+.l1{border-left-color:var(--warn)}.l1 svg{color:var(--warn)}.l2{border-left-color:#F97316}.l2 svg{color:#F97316}
+.l3{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.4);border-left-color:var(--bad)}.l3:hover{background:rgba(244,63,94,.18)}.l3 b,.l3 svg{color:#FCA5A5}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;right:20px;bottom:20px;z-index:120;display:flex;gap:10px;align-items:center;min-width:260px;max-width:min(420px,calc(100vw - 40px));padding:12px 16px 15px;background:#0A0E1B!important;color:var(--text)!important;border:1px solid var(--brd);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.55);overflow:hidden;font-weight:500;--c:var(--pri)}
+#toast::before{content:"i";flex:none;width:24px;height:24px;border-radius:50%;background:var(--c);color:#04101C;display:grid;place-items:center;font-weight:700;font-size:13px;box-shadow:0 0 12px -1px var(--c)}
+#toast[data-t=ok]{--c:var(--ok)}#toast[data-t=ok]::before{content:"✓"}#toast[data-t=warn]{--c:var(--warn)}#toast[data-t=warn]::before{content:"!"}#toast[data-t=err]{--c:var(--bad);color:#fff!important}#toast[data-t=err]::before{content:"×";color:#fff}
+#toast::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--c);transform-origin:left}
+#toast.toast-animate{animation:slideUp .25s ease-out}#toast.toast-animate::after{animation:tb 2.8s linear forwards}
+@keyframes slideUp{from{transform:translateY(12px);opacity:0}}@keyframes tb{to{transform:scaleX(0)}}
+
+/* ---------- loading / pdf overlay ---------- */
+#loadingOverlay{position:fixed;inset:0;background:rgba(2,4,10,.78);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100}#loadingOverlay.show{display:flex}
+.lbox{background:#0A0E1B;border:1px solid var(--brd);border-radius:16px;padding:28px 32px;width:min(380px,calc(100vw - 32px));text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6),var(--glow-pri)}
+.spinner{width:56px;height:56px;margin:0 auto 16px;border-radius:50%;background:conic-gradient(var(--pri) 0turn,rgba(148,168,255,.12) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px));mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px));animation:spin .9s linear infinite;filter:drop-shadow(0 0 10px rgba(56,189,248,.6))}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lbox h3{margin:0 0 4px;font:700 18px 'Chakra Petch',sans-serif;color:#fff}.lbox p{margin:0;color:var(--mut)}#pdfProgressText{margin-top:14px;font-weight:600;color:var(--pri)}.lbox .track{margin-top:10px}
+.scrim{position:fixed;inset:0;background:rgba(2,4,10,.6);z-index:60}
+.pop-scrim{position:fixed;inset:0;background:rgba(2,4,10,.45);z-index:39;animation:popScrimIn .15s ease}
+@keyframes popScrimIn{from{opacity:0}to{opacity:1}}
+#printHeader{display:none}
+@media(max-width:1023px){.app{display:block}.side{position:fixed;left:0;top:0;width:272px;transform:translateX(-100%);transition:transform .2s}.side.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
+#menuBtn{display:grid}.top{padding:0 12px}.wrap{padding:16px 12px}.two{grid-template-columns:1fr}.tscroll{max-height:calc(100dvh - 150px)}}
+@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--brd)}
+.sig{grid-template-columns:1fr}.hero h1{font-size:19px}.crumb,.tool .model{display:none}.drawer .modal-box{border-radius:0}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.bar .btn-lg{flex:1 1 40%}.bar .sep{display:none}.chip.date{display:none}.menu{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+@media print{
+body{background:#fff;font-size:12pt}:root{padding:0}.no-print,.side,.top,.scrim,#bgFx{display:none!important}
+.app{display:block}.wrap{padding:0;display:block;max-width:none}#reportArea{display:block}.card{border:0;box-shadow:none;border-radius:0;margin-top:10px;background:#fff!important;backdrop-filter:none}
+.tscroll{overflow:visible;max-height:none}#printHeader{display:block;text-align:center;margin-bottom:12px}
+#inspectionTable{border-collapse:collapse}
+#inspectionTable th,#inspectionTable td{border:1px solid #000!important;padding:4px!important;font-size:10pt;position:static!important;background:#fff!important;color:#000!important;box-shadow:none!important;height:auto!important}
+.scr{display:none}.prt{display:inline}
+#tableBody .field{border:0;background:none;padding:0!important;height:auto}
+#tableBody td.tick-cell label::before{display:none!important}
+#tableBody td.tick-cell label::after{content:""!important;border:0!important;background:none!important;min-width:0!important;height:auto!important;padding:0!important;color:#000!important}
+#tableBody td.tick-cell label:has(input:checked)::after{content:"✔"!important;font-size:12pt}
+@page{size:A4 landscape;margin:10mm}}
+
+/* ==========================================================================
+   PKP Device Check — Cute Feminine Skin (visual-only re-skin)
+   ไม่แตะ ID / Class ที่ JS ใช้ / Logic เดิม — ปรับเฉพาะ CSS ทั้งหมด
+   ========================================================================== */
+:root{
+  --pri:#F472B6; --pri-d:#EC4899; --ind:#C4B5FD;
+  --bg:#FFF6FA; --line:rgba(236,180,214,.4); --text:#4A3B4A; --mut:#A78CA0;
+  --ok:#34D399; --warn:#F6C87A; --bad:#FB7B93; --teal:#7FD9CB;
+  --ok-s:rgba(52,211,153,.14); --bad-s:rgba(251,123,147,.14); --warn-s:rgba(246,200,122,.18); --pri-s:rgba(244,114,182,.14);
+  --r:18px; --hh:66px;
+  --sh:0 2px 8px rgba(219,146,184,.10), 0 16px 36px -18px rgba(219,146,184,.35);
+  --panel:#FFFFFF; --brd:rgba(236,180,214,.5);
+  --glow-pri:0 0 0 1px rgba(244,114,182,.18), 0 6px 20px -6px rgba(244,114,182,.4);
+  --glow-viol:0 0 0 1px rgba(196,181,253,.25), 0 6px 20px -8px rgba(196,181,253,.5);
+}
+body{background:var(--bg);color:var(--text)}
+::selection{background:rgba(244,114,182,.25)}
+.tscroll::-webkit-scrollbar-thumb{background:rgba(244,114,182,.3)}
+.tscroll::-webkit-scrollbar-track{background:rgba(244,114,182,.06)}
+
+/* ---------- ambient background: soft pastel blobs, low opacity ---------- */
+#bgFx{background:
+ radial-gradient(1000px 640px at 10% -10%, rgba(244,114,182,.14), transparent 60%),
+ radial-gradient(900px 620px at 105% 8%, rgba(196,181,253,.16), transparent 55%),
+ radial-gradient(760px 560px at 40% 108%, rgba(253,186,140,.14), transparent 60%),
+ linear-gradient(180deg,#FFFDFC 0%,#FFF6FA 45%,#FDF3FA 100%)}
+.bgFx-grid{background-image:linear-gradient(rgba(244,114,182,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(244,114,182,.045) 1px,transparent 1px)}
+.bgFx-glow{filter:blur(90px);opacity:.5}
+.bgFx-glow-1{background:radial-gradient(circle,rgba(244,114,182,.45),transparent 70%)}
+.bgFx-glow-2{background:radial-gradient(circle,rgba(196,181,253,.4),transparent 70%)}
+.bgFx-glow-3{background:radial-gradient(circle,rgba(125,217,203,.35),transparent 70%)}
+.bgFx-noise{opacity:.015}
+
+/* ---------- sidebar ---------- */
+.side{background:linear-gradient(180deg,#FFFFFF,#FFF7FB);backdrop-filter:blur(14px);border-right:1px solid var(--brd);box-shadow:2px 0 24px -14px rgba(219,146,184,.35)}
+.brand{border-bottom:1px solid var(--brd)}
+.logo{background:linear-gradient(135deg,var(--pri),var(--ind));color:#fff;box-shadow:var(--glow-pri);border-radius:14px}
+.brand b{color:#4A3B4A;font-family:Sarabun,sans-serif}.brand small{color:var(--mut)}
+.nav a{color:#8A7690;border-radius:14px}
+.nav a:hover{background:rgba(244,114,182,.1);color:#4A3B4A}
+.nav a[aria-current=true]{background:linear-gradient(90deg,rgba(244,114,182,.18),rgba(196,181,253,.16));color:#C2367F;font-weight:700}
+.nav a[aria-current=true]::before{background:linear-gradient(180deg,var(--pri),var(--ind));box-shadow:0 0 10px 1px rgba(244,114,182,.5)}
+.nav a[aria-current=true] svg{color:var(--pri-d)}
+.side-foot{border-top:1px solid var(--brd);color:#8A7690}
+.dot{background:var(--ok);box-shadow:0 0 8px 1px var(--ok)}
+
+/* ---------- top header ---------- */
+.top{background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--brd)}
+.top h2{color:#4A3B4A}
+.chip{border:1px solid var(--brd);background:#FFF0F7;color:#7A5C74;border-radius:14px}
+.chip svg{color:var(--pri-d)}.chip.auto{color:#A78CA0}
+.x{color:var(--mut)}.x:hover{background:rgba(244,114,182,.12);color:#4A3B4A}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--brd);box-shadow:var(--sh);border-radius:20px}
+.card>h3{color:#4A3B4A;border-bottom:1px solid var(--brd);font-family:Sarabun,sans-serif;font-weight:700}
+.card>h3 svg{color:var(--pri-d)}
+
+/* ---------- hero ---------- */
+.hero .ic{background:linear-gradient(135deg,rgba(244,114,182,.22),rgba(196,181,253,.28));color:var(--pri-d);box-shadow:var(--glow-pri);border-radius:16px}
+.hero-eyebrow{color:var(--pri-d)}
+.hero h1{color:#4A3B4A;font-family:Sarabun,sans-serif}.hero p{color:var(--mut)}
+.hv-ring{background:conic-gradient(var(--pri) calc(var(--p)*1%), rgba(244,114,182,.14) 0);box-shadow:0 0 26px -6px rgba(244,114,182,.5)}
+.hv-ring-inner{background:#fff}
+.hv-ring-inner b{color:#4A3B4A}.hv-ring-inner small{color:var(--mut)}
+.hv-card{background:#fff;border:1px solid var(--brd);border-radius:14px}
+.hv-dot{background:var(--ok);box-shadow:0 0 8px 1px var(--ok)}
+.hv-card b{color:#4A3B4A}.hv-card small{color:var(--mut)}
+
+/* ---------- form fields ---------- */
+.fl{color:#7A5C74}.fl i{color:var(--bad)}
+.field{background:#FFFBFD;border:1.5px solid rgba(236,180,214,.55);color:var(--text);border-radius:12px}
+.field::placeholder{color:#C7B3C4}
+.field:hover{border-color:rgba(244,114,182,.5)}
+.field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(244,114,182,.18)}
+.field-missing{border-color:var(--bad)!important;box-shadow:0 0 0 3px rgba(251,123,147,.2)!important}
+.sw>svg{color:var(--pri-d)}.sw button:hover{background:rgba(244,114,182,.12);color:#4A3B4A}
+
+/* ---------- buttons ---------- */
+.btn{border:1px solid var(--brd);background:#fff;color:#7A5C74;border-radius:13px;font-weight:600}
+.btn:hover{background:#FFF0F7;border-color:rgba(244,114,182,.4)}
+.btn-primary{background:linear-gradient(135deg,var(--pri),var(--ind));border-color:transparent;color:#fff;box-shadow:var(--glow-pri)}
+.btn-primary:hover{filter:brightness(1.05);box-shadow:0 0 0 1px rgba(244,114,182,.3),0 10px 26px -6px rgba(244,114,182,.55)}
+.btn-primary.danger-fill{background:linear-gradient(135deg,#FB7B93,#EF5A78);box-shadow:0 0 0 1px rgba(251,123,147,.3),0 10px 22px -6px rgba(251,123,147,.5)}
+.btn-danger{color:#E1497A;border-color:rgba(251,123,147,.4)}
+.btn-danger:hover{background:rgba(251,123,147,.12);border-color:rgba(251,123,147,.6)}
+.pop{background:#fff;border:1px solid var(--brd);box-shadow:0 20px 50px rgba(219,146,184,.28);border-radius:14px}
+.pop .btn:hover{background:#FFF0F7}
+
+/* ---------- dashboard summary ---------- */
+.stat{border-right:1px solid var(--brd)}.stat span{color:var(--mut)}
+.stat--total::before{background:var(--pri)}.stat--pass::before{background:var(--ok)}
+.stat--fail::before{background:var(--bad)}.stat--pending::before{background:var(--warn)}
+.stat b{color:#4A3B4A}
+.stat--pass b{text-shadow:none;color:#1DA57A!important}
+.stat--fail b{text-shadow:none;color:#E1497A!important}
+.stat--pending b{text-shadow:none;color:#D89A2C!important}
+.pg-h{color:#7A5C74}
+.track{background:rgba(244,114,182,.12)}
+.fill{background:linear-gradient(90deg,var(--pri),var(--ind));box-shadow:none}
+.is-complete .fill,.pg.done .fill{background:linear-gradient(90deg,var(--ok),#6EE7B7);box-shadow:none}
+.ex svg{color:var(--pri-d)}.ex b{color:#4A3B4A}.ex small{color:var(--mut)}
+.ex{border-radius:14px}.ex:hover{transform:translateY(-2px)}
+
+/* ---------- inspection strip / progress ---------- */
+.strip{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border:1px solid var(--brd);box-shadow:var(--sh)}
+.strip .k{color:var(--mut)}
+.pill{background:var(--warn-s);color:#B4791F;border:1px solid rgba(246,200,122,.5)}
+.pill[data-s=done]{background:var(--ok-s);color:#1DA57A;border-color:rgba(52,211,153,.4)}
+.pill[data-s=idle]{background:#FFF0F7;color:var(--mut);border-color:var(--brd)}
+#sbPercent{color:#4A3B4A}
+
+/* ---------- inspection table ---------- */
+.tool{border-bottom:1px solid var(--brd)}.tool label{color:#7A5C74}.tool .model{color:var(--mut)}.tool .model b{color:#4A3B4A}
+#inspectionTable th,#inspectionTable td{border-right:1px solid var(--brd);border-bottom:1px solid var(--brd)}
+#inspectionTable thead th{background:#FFF0F7;color:#8A7690}
+thead tr:first-child th{color:#4A3B4A;border-right-color:rgba(244,114,182,.25)}
+.g1{background:#FFF0F7!important}
+.g2{background:linear-gradient(180deg,#F8DCEE,#F3CBE6)!important}
+.g3{background:linear-gradient(180deg,#DDF3EC,#CDEEE3)!important}
+.g4{background:linear-gradient(180deg,#E7E0FB,#DCD2F9)!important}
+.g5{background:#FDEFE1!important}
+.g2,.g3,.g4,.g5{border-left:2px solid rgba(255,255,255,.7)}
+.sticky-col-2{box-shadow:1px 0 0 var(--brd),6px 0 10px -6px rgba(219,146,184,.18)}
+#tableBody tr{--bg:#fff}#tableBody tr:nth-child(even){--bg:#FFF9FC}
+#tableBody tr.row-pass{--bg:rgba(52,211,153,.10)}#tableBody tr.row-fail{--bg:rgba(251,123,147,.12)}
+#tableBody tr.row-fail td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
+#tableBody tr:hover{--bg:rgba(244,114,182,.09)}#tableBody tr.row-pass:hover{--bg:rgba(52,211,153,.18)}#tableBody tr.row-fail:hover{--bg:rgba(251,123,147,.18)}
+#tableBody td{color:#4A3B4A}
+#tableBody tr:focus-within td:first-child{box-shadow:inset 3px 0 0 var(--pri)}
+#tableBody td:nth-child(1){color:var(--mut)}#tableBody td:nth-child(2){color:#4A3B4A}
+#inspectionTable tbody td:nth-child(4),#inspectionTable tbody td:nth-child(14),#inspectionTable tbody td:nth-child(20),#inspectionTable tbody td:nth-child(22),
+#inspectionTable thead tr:nth-child(2) th:nth-child(4),#inspectionTable thead tr:nth-child(2) th:nth-child(14),#inspectionTable thead tr:nth-child(2) th:nth-child(20),#inspectionTable thead tr:nth-child(2) th:nth-child(22){border-left:2px solid rgba(244,114,182,.3)}
+#tableBody td.tick-cell:hover{background:rgba(244,114,182,.14)}
+#tableBody td.tick-cell:has(input:checked){background:rgba(52,211,153,.14)}
+#tableBody td.tick-cell:has(input:focus-visible){outline:2px solid var(--pri)}
+#tableBody td.tick-cell label::before{border:1.5px solid rgba(236,180,214,.7);background:#fff;border-radius:7px}
+#tableBody td.tick-cell label:has(input:checked)::before{background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--ok);box-shadow:0 0 10px -1px rgba(52,211,153,.5)}
+#tableBody td.tick-pass label::after,#tableBody td.tick-fail label::after{border:1px solid rgba(236,180,214,.6);background:#FFF6FA;color:var(--mut);border-radius:10px}
+#tableBody td.tick-pass label:hover::after{border-color:var(--ok);color:#1DA57A}
+#tableBody td.tick-fail label:hover::after{border-color:var(--bad);color:#E1497A}
+#tableBody td.tick-pass label:has(input:checked)::after{background:linear-gradient(135deg,var(--ok),#22C58F);border-color:transparent;color:#fff;box-shadow:0 0 12px -2px rgba(52,211,153,.6)}
+#tableBody td.tick-fail label:has(input:checked)::after{background:linear-gradient(135deg,var(--bad),#EF5A78);border-color:transparent;color:#fff;box-shadow:0 0 12px -2px rgba(251,123,147,.6)}
+.note small{color:var(--mut)}
+.sig h4{color:#4A3B4A}.sig .line{border-bottom:1px dotted rgba(236,180,214,.8);color:var(--mut)}.sig p{color:#4A3B4A}
+
+/* ---------- modals / drawer ---------- */
+.modal-back{background:rgba(74,59,74,.35)}
+.modal-box{background:#fff;border:1px solid var(--brd);border-radius:22px;box-shadow:0 30px 70px rgba(219,146,184,.35),var(--glow-viol)}
+.modal-head{border-bottom:1px solid var(--brd);background:linear-gradient(90deg,rgba(244,114,182,.08),rgba(196,181,253,.08))}
+.modal-head h3{color:#4A3B4A}.modal-head small{color:var(--mut)}
+.modal-body{color:#4A3B4A}.modal-foot{border-top:1px solid var(--brd)}
+.student-row{border-bottom:1px solid var(--brd)}.student-row .no{color:var(--mut)}
+.icon-btn{border:1px solid var(--brd);background:#FFF6FA;color:#7A5C74}
+.icon-btn:hover{background:#FFEAF4;color:#4A3B4A}
+.icon-btn.del{color:#E1497A;border-color:rgba(251,123,147,.4)}.icon-btn.del:hover{background:rgba(251,123,147,.14)}
+.lvl{border:1px solid var(--brd);background:#FFFBFD;color:#4A3B4A;border-radius:14px}
+.lvl:hover{background:#FFF0F7}.lvl b{color:#4A3B4A}.lvl small{color:var(--mut)}
+.l1{border-left-color:var(--warn)}.l1 svg{color:#D89A2C}
+.l2{border-left-color:#F6A05A}.l2 svg{color:#F6A05A}
+.l3{background:rgba(251,123,147,.1);border-color:rgba(251,123,147,.4);border-left-color:var(--bad)}
+.l3:hover{background:rgba(251,123,147,.18)}.l3 b,.l3 svg{color:#E1497A}
+
+/* ---------- toast ---------- */
+#toast{background:#fff!important;color:#4A3B4A!important;border:1px solid var(--brd);box-shadow:0 16px 40px rgba(219,146,184,.3);--c:var(--pri)}
+#toast::before{color:#fff}
+#toast[data-t=ok]{--c:var(--ok)}#toast[data-t=warn]{--c:#D89A2C}
+#toast[data-t=err]{--c:var(--bad);color:#4A3B4A!important}
+
+/* ---------- loading / pdf overlay ---------- */
+#loadingOverlay{background:rgba(74,59,74,.32)}
+.lbox{background:#fff;border:1px solid var(--brd);box-shadow:0 30px 70px rgba(219,146,184,.35),var(--glow-pri);border-radius:22px}
+.spinner{background:conic-gradient(var(--pri) 0turn, rgba(244,114,182,.14) 0);filter:drop-shadow(0 0 8px rgba(244,114,182,.4))}
+.lbox h3{color:#4A3B4A}.lbox p{color:var(--mut)}#pdfProgressText{color:var(--pri-d)}
+.scrim{background:rgba(74,59,74,.25)}
+.pop-scrim{background:rgba(74,59,74,.18)}
+</style>
+<!-- โหลดแบบ defer: ไม่บล็อกการวาดหน้าเว็บ/CSS ด้านบน (แก้ปัญหาหน้าจอค้าง/องค์ประกอบซ้อนทับกันตอนโหลดช้า) -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div id="bgFx" aria-hidden="true"><div class="bgFx-grid"></div><div class="bgFx-glow bgFx-glow-1"></div><div class="bgFx-glow bgFx-glow-2"></div><div class="bgFx-glow bgFx-glow-3"></div><div class="bgFx-noise"></div></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-dash" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol><symbol id="i-clip" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol><symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol><symbol id="i-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol><symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></symbol><symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6M14 11v6"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol><symbol id="i-laptop" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></symbol><symbol id="i-sheet" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2M14 13h2M8 17h2M14 17h2"/></symbol><symbol id="i-pdf" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8M16 13H8M16 17H8"/></symbol><symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol><symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol><symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol><symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol><symbol id="i-school" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol><symbol id="i-note" viewBox="0 0 24 24"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></symbol><symbol id="i-warn" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol><symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol><symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></symbol></svg>
+<div class="app">
+<aside class="side no-print" id="side" aria-label="เมนูหลัก">
+ <div class="brand"><div class="logo"><svg class="i" aria-hidden="true"><use href="#i-laptop"/></svg></div><div><b>PKP Device Check</b><small>ระบบตรวจสอบอุปกรณ์การเรียนการสอน</small></div></div>
+ <nav class="nav">
+  <a href="#" data-go="sec-dash" aria-current="true"><svg class="i" aria-hidden="true"><use href="#i-dash"/></svg>Dashboard</a>
+  <a href="#" data-go="sec-inspect"><svg class="i" aria-hidden="true"><use href="#i-clip"/></svg>ตรวจสอบอุปกรณ์</a>
+  <a href="#" data-go="manage"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg>รายชื่อนักเรียน</a>
+  <a href="#" data-go="sec-actions" data-focus="loadBtn"><svg class="i" aria-hidden="true"><use href="#i-db"/></svg>ข้อมูลที่บันทึก</a>
+  <a href="#" data-go="sec-export"><svg class="i" aria-hidden="true"><use href="#i-dl"/></svg>ส่งออกเอกสาร</a>
+  <a href="#" data-go="sec-setup" data-focus="inspectorName"><svg class="i" aria-hidden="true"><use href="#i-gear"/></svg>ตั้งค่า</a>
+ </nav>
+ <div class="side-foot">โรงเรียนปากคาดพิทยาคม<div><i class="dot"></i>ระบบทำงานบนเครื่องนี้</div></div>
+</aside>
+<div class="scrim hidden no-print" id="scrim"></div>
+<div class="main">
+<header class="top no-print">
+ <button class="x" id="menuBtn" aria-label="เปิดเมนู" title="เมนู"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg></button>
+ <div><div class="crumb">หน้าแรก / ตรวจสอบอุปกรณ์</div><h2>ตรวจสอบอุปกรณ์</h2></div><span class="sp"></span>
+ <span class="chip" title="ห้องเรียนที่เลือก"><svg class="i" aria-hidden="true"><use href="#i-school"/></svg><span id="hdClass">ยังไม่ได้เลือกห้อง</span></span>
+ <span class="chip date" title="วันนี้"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span id="topnavDate">-</span></span>
+ <span class="chip auto" id="autoSave" data-s="idle" role="status" title="ข้อมูลบันทึกในเบราว์เซอร์เครื่องนี้"><i class="dot"></i><span>ยังไม่ได้เลือกห้อง</span></span>
+</header>
+<div class="wrap">
+ <section class="hero no-print" id="sec-dash">
+  <div class="hero-main"><div class="ic"><svg class="i" aria-hidden="true"><use href="#i-laptop"/></svg></div><div><span class="hero-eyebrow">School Device Inspection Command Center</span><h1>ตรวจสอบอุปกรณ์การเรียนการสอน</h1><p>โรงเรียนปากคาดพิทยาคม สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน</p></div></div>
+  <div class="hero-visual" aria-hidden="true">
+   <div class="hv-ring" id="heroHealthRing"><div class="hv-ring-inner"><b id="heroHealthPct">--%</b><small>DEVICE HEALTH</small></div></div>
+   <div class="hv-card"><span class="hv-dot" id="heroScanDot"></span><b id="heroScanLabel">READY</b><small>SCANNING STATUS</small></div>
+  </div>
+ </section>
+
+ <section class="card no-print" id="sec-setup"><h3><svg class="i" aria-hidden="true"><use href="#i-clip"/></svg>ข้อมูลการตรวจสอบ</h3>
+  <div class="cb"><div class="grid">
+   <div><label class="fl" for="classSelect">ห้องเรียน <i>*</i></label><select id="classSelect" class="field"><option value="">-- กรุณาเลือกห้องเรียน --</option><option value="4/8">ม. 4/8</option><option value="5/1">ม. 5/1</option><option value="5/2">ม. 5/2</option><option value="5/3">ม. 5/3</option><option value="5/4">ม. 5/4</option><option value="5/5">ม. 5/5</option><option value="5/6">ม. 5/6</option><option value="5/7">ม. 5/7</option><option value="5/8">ม. 5/8</option><option value="5/9">ม. 5/9</option></select></div>
+   <div><label class="fl" for="inspectionDate">วันที่ตรวจสอบ <i>*</i></label><input type="date" id="inspectionDate" class="field"></div>
+   <div><label class="fl" for="searchInput">ค้นหานักเรียนหรือ Serial No.</label><div class="sw"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="text" id="searchInput" class="field" placeholder="ค้นหาชื่อนักเรียน หรือ Serial No." autocomplete="off"><button type="button" id="searchClear" aria-label="ล้างคำค้นหา" title="ล้างคำค้นหา"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div></div>
+   <div><label class="fl" for="inspectorName">ผู้ตรวจสอบ <i>*</i></label><input type="text" id="inspectorName" class="field" placeholder="ชื่อ - สกุล ผู้ตรวจสอบ"></div>
+   <div><label class="fl" for="inspectorPosition">ตำแหน่ง</label><input type="text" id="inspectorPosition" class="field" placeholder="เช่น ครูที่ปรึกษา ม.5/1"></div>
+   <div><label class="fl" for="deviceModel">ยี่ห้อ / รุ่นอุปกรณ์</label><input type="text" id="deviceModel" class="field" value="Acer Chromebook spin 311"></div>
+  </div></div>
+  <div class="bar" id="sec-actions">
+   <button id="saveBtn" class="btn btn-primary btn-lg"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึกข้อมูล</button>
+   <button id="pdfBtn" class="btn btn-primary btn-lg"><svg class="i" aria-hidden="true"><use href="#i-dl"/></svg>ดาวน์โหลด PDF</button><span class="sep"></span>
+   <button id="printBtn" class="btn"><svg class="i" aria-hidden="true"><use href="#i-print"/></svg>พิมพ์เอกสาร</button>
+   <button id="csvBtn" class="btn"><svg class="i" aria-hidden="true"><use href="#i-sheet"/></svg>ดาวน์โหลด Excel (.xlsx)</button>
+   <button id="loadBtn" class="btn"><svg class="i" aria-hidden="true"><use href="#i-undo"/></svg>เรียกข้อมูลที่บันทึกไว้</button>
+   <div class="menu"><button type="button" class="btn" id="moreBtn" aria-haspopup="menu" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="#i-more"/></svg>เพิ่มเติม<svg class="i" aria-hidden="true"><use href="#i-chev"/></svg></button>
+    <div class="pop no-print" id="morePop" role="menu" hidden>
+     <button id="allPassBtn" class="btn" role="menuitem"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>กำหนด "ปกติทั้งหมด" ทุกคน</button>
+     <button id="manageBtn" class="btn" role="menuitem"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg>จัดการรายชื่อนักเรียน</button>
+     <button id="clearBtn" class="btn btn-danger" role="menuitem"><svg class="i" aria-hidden="true"><use href="#i-trash"/></svg>ล้างข้อมูล...</button>
+    </div></div>
+  </div>
+ </section>
+
+ <div class="two no-print">
+  <section class="card" id="sec-progress"><h3><svg class="i" aria-hidden="true"><use href="#i-clip"/></svg>สรุปผลการตรวจสอบ</h3>
+   <div class="stats">
+    <div class="stat stat--total"><span>นักเรียนทั้งหมด</span><b id="statTotal">0</b></div>
+    <div class="stat stat--pass"><span>ผ่าน / พร้อมใช้งาน</span><b id="statPass" style="color:var(--ok)">0</b></div>
+    <div class="stat stat--fail"><span>ไม่ผ่านการตรวจสอบ</span><b id="statFail" style="color:var(--bad)">0</b></div>
+    <div class="stat stat--pending"><span>ยังไม่ได้ตรวจ</span><b id="statPending" style="color:var(--warn)">0</b></div>
+   </div>
+   <div class="pg" id="pcBox"><div class="pg-h"><span>ความคืบหน้าการตรวจสอบ</span><span id="pcCount">0 / 0 คน</span></div><div class="track"><div class="fill" id="pcFill"></div></div><div class="pg-h mut" style="font-weight:500"><span id="pcRemain">ยังไม่ได้เลือกห้อง</span><span id="pcPct">0%</span></div></div>
+  </section>
+  <section class="card" id="sec-export"><h3><svg class="i" aria-hidden="true"><use href="#i-dl"/></svg>ส่งออกเอกสาร</h3><div class="cb">
+   <button class="btn ex" data-proxy="pdfBtn"><svg class="i" aria-hidden="true"><use href="#i-pdf"/></svg><span><b>PDF</b><small>เอกสาร A4 แนวนอน พร้อมพิมพ์</small></span></button>
+   <button class="btn ex" data-proxy="csvBtn"><svg class="i" aria-hidden="true"><use href="#i-sheet"/></svg><span><b>Excel (.xlsx)</b><small>ข้อมูลตารางสำหรับเปิดใน Excel</small></span></button>
+   <button class="btn ex" data-proxy="printBtn" style="margin:0"><svg class="i" aria-hidden="true"><use href="#i-print"/></svg><span><b>Print</b><small>พิมพ์เอกสารจากเบราว์เซอร์</small></span></button>
+  </div></section>
+ </div>
+
+ <div class="insp" id="sec-inspect">
+  <div class="strip no-print" id="sbStrip">
+   <span><span class="k">ห้อง:</span><b id="sbClass">-</b></span><span><span class="k">วันที่:</span><b id="sbDate">-</b></span>
+   <span><span class="k">ตรวจแล้ว:</span><b id="sbProgress">0/0</b></span>
+   <span><span class="k">สถานะ:</span><span class="pill" id="sbStatus" data-s="idle">ยังไม่ได้เลือกห้อง</span></span>
+   <div class="track"><div class="fill" id="sbFill"></div></div><b id="sbPercent">0%</b><span id="sbRemain"></span>
+  </div>
+  <div id="reportArea">
+   <div id="printHeader">
+    <h2 style="margin:0;font-size:20pt">แบบฟอร์มตรวจสอบอุปกรณ์การเรียนการสอนออนไลน์</h2><h3 style="margin:4px 0 8px;font-weight:400">โรงเรียนปากคาดพิทยาคม สํานักงานคณะกรรมการการศึกษาขั้นพื้นฐาน</h3>
+    <div style="display:flex;justify-content:space-between;text-align:left;font-size:11pt"><div>ส่วนที่ 1 : ข้อมูลอุปกรณ์ นักเรียนห้อง <b id="printClass">____</b></div><div>วันที่ตรวจสอบ <b id="printDate">......../....../........</b></div></div>
+    <div style="text-align:left;font-size:11pt">ยี่ห้อ/รุ่น : <span id="printModel">Acer Chromebook spin 311</span></div>
+   </div>
+   <section class="card tcard">
+    <div class="tool no-print">
+     <label for="filterSelect"><svg class="i" aria-hidden="true"><use href="#i-filter"/></svg>กรองตามสถานะ</label>
+     <select id="filterSelect" class="field"><option value="all">ทั้งหมด</option><option value="pass">ผ่าน / พร้อมใช้งาน</option><option value="fail">ไม่ผ่านการตรวจสอบ</option><option value="pending">ยังไม่ได้ตรวจ</option><option value="note">มีหมายเหตุ</option><option value="nosn">ไม่มี Serial</option></select>
+     <label for="sortSelect">เรียงลำดับ</label>
+     <select id="sortSelect" class="field"><option value="default">ลำดับเดิม</option><option value="name-asc">ชื่อ A-Z</option><option value="name-desc">ชื่อ Z-A</option><option value="status">สถานะ (ไม่ผ่านก่อน)</option></select>
+     <span class="model">ยี่ห้อ / รุ่น: <b id="modelEcho">Acer Chromebook spin 311</b> · คลิกที่ช่องเพื่อทำเครื่องหมาย</span>
+    </div>
+    <div class="tscroll"><table id="inspectionTable"><thead><tr><th colspan="2" class="g1 gs">ข้อมูลนักเรียน</th><th class="g1"></th><th colspan="10" class="g2"><span class="scr">ตรวจสอบสภาพเครื่อง</span><span class="prt">ส่วนที่ 2 รายการตรวจสอบสภาพเครื่อง</span></th><th colspan="6" class="g3"><span class="scr">อุปกรณ์ที่ได้รับ</span><span class="prt">ส่วนที่ 3 อุปกรณ์ที่ได้รับพร้อมเครื่อง</span></th><th colspan="2" class="g4"><span class="scr">ผลการตรวจสอบ</span><span class="prt">ส่วนที่ 4 ผลการตรวจสอบ</span></th><th class="g5">หมายเหตุ</th><th class="g5 no-print"></th></tr><tr><th class="sticky-col sticky-col-1">ลำดับ</th><th class="sticky-col sticky-col-2">ชื่อ - สกุล</th><th style="min-width:150px">หมายเลขเครื่อง<br>(Serial No.)</th><th class="c2">1. ตัวเครื่องภายนอกสมบูรณ์</th><th class="c2">2. หน้าจอแสดงผลชัดเจน</th><th class="c2">3. Touch Screen ตอบสนองปกติ</th><th class="c2">4. ปุ่มกด/ปุ่มเปิด–ปิด ใช้งานได้</th><th class="c2">5. ช่องเสียบชาร์จและหูฟัง ใช้งานได้</th><th class="c2">6. แบตเตอรี่ชาร์จได้ปกติ</th><th class="c2">7. กล้องหน้า/หลัง ใช้งานได้</th><th class="c2">8. ระบบเสียง ใช้งานได้</th><th class="c2">9. เชื่อมต่อเน็ต WIFI ได้</th><th class="c2">10. ระบบปฏิบัติการสมบูรณ์</th><th class="c3">1. Adaptor</th><th class="c3">2. สายชาร์จ</th><th class="c3">3. ปากกา</th><th class="c3">4. คีย์บอร์ด</th><th class="c3">5. คู่มือ</th><th class="c3">6. กระเป๋า</th><th class="c4">1. ผ่าน / พร้อมใช้งาน</th><th class="c4">2. ไม่ผ่านการตรวจสอบ</th><th style="min-width:200px">หมายเหตุ / ปัญหาที่พบ</th><th class="no-print" style="min-width:190px">จัดการ</th></tr></thead><tbody id="tableBody"><tr><td colspan="22" class="text-center p-8 text-gray-500">กรุณาเลือกห้องเรียนเพื่อโหลดรายชื่อนักเรียน</td></tr></tbody></table></div>
+   </section>
+   <section class="card note"><h3><svg class="i" aria-hidden="true"><use href="#i-note"/></svg>หมายเหตุอื่น ๆ (ภาพรวมของห้อง)</h3><div class="cb"><label class="fl" for="generalNote">หมายเหตุภาพรวมของห้อง</label><textarea id="generalNote" class="field" rows="4" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)..."></textarea><small class="no-print">ใช้สำหรับบันทึกปัญหาหรือข้อมูลเพิ่มเติมของห้องเรียน</small></div></section>
+   <div class="sig">
+    <div class="card"><h4>ผู้ตรวจสอบ</h4><div class="line">ลงชื่อ ..................................</div><p>( <span id="signInspector">........................................</span> )</p><p class="mut" id="signPosition">ตำแหน่ง ........................................</p></div>
+    <div class="card"><h4>ผู้รับรอง</h4><div class="line">ลงชื่อ ..................................</div><p>( ........................................ )</p><p class="mut">ตำแหน่ง ผู้บริหารสถานศึกษา</p></div>
+   </div>
+  </div>
+ </div>
+</div></div></div>
+
+<div class="modal-back drawer no-print" id="studentModal" role="dialog" aria-modal="true" aria-labelledby="smTitle"><div class="modal-box">
+ <div class="modal-head"><div><h3 id="smTitle">จัดการรายชื่อนักเรียน</h3><small>ห้อง <span id="smClass">-</span></small></div><button class="x" onclick="closeModal('studentModal')" aria-label="ปิด" title="ปิด"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+ <div class="modal-body">
+  <div class="sw"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="smSearch" class="field" placeholder="ค้นหารายชื่อนักเรียน" aria-label="ค้นหารายชื่อนักเรียน"></div>
+  <div style="display:flex;gap:8px;margin:12px 0"><input type="text" id="newStudentName" class="field" placeholder="ชื่อ - สกุล นักเรียน" aria-label="ชื่อ - สกุล นักเรียน"><button class="btn btn-primary" id="addStudentBtn"><svg class="i" aria-hidden="true"><use href="#i-plus"/></svg>เพิ่มรายชื่อ</button></div>
+  <div id="studentList"></div></div>
+ <div class="modal-foot"><button class="btn btn-danger" id="resetStudentsBtn"><svg class="i" aria-hidden="true"><use href="#i-undo"/></svg>คืนค่ารายชื่อเดิมของห้องนี้</button><button class="btn btn-primary" onclick="closeModal('studentModal')">เสร็จสิ้น</button></div>
+</div></div>
+
+<div class="modal-back no-print" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="clTitle"><div class="modal-box">
+ <div class="modal-head"><div><h3 id="clTitle">ล้างข้อมูล</h3><small>เลือกระดับการล้างข้อมูล ระบบจะขอให้ยืนยันอีกครั้งก่อนลบจริง</small></div><button class="x" onclick="closeModal('clearModal')" aria-label="ปิด" title="ปิด"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+ <div class="modal-body">
+  <button type="button" class="lvl l1" id="clearRowsBtn"><svg class="i" aria-hidden="true"><use href="#i-undo"/></svg><span><b>ล้างผลตรวจของวันนี้</b><small>ล้างเฉพาะผลตรวจของห้องที่เลือกในวันที่ปัจจุบัน</small></span></button>
+  <button type="button" class="lvl l2" id="clearClassBtn"><svg class="i" aria-hidden="true"><use href="#i-trash"/></svg><span><b>ล้างข้อมูลของห้องนี้</b><small>ล้างข้อมูลทุกวันที่ของห้องที่เลือก</small></span></button>
+  <button type="button" class="lvl l3" id="clearAllBtn" style="margin:0"><svg class="i" aria-hidden="true"><use href="#i-warn"/></svg><span><b>ล้างข้อมูลทั้งหมด</b><small>ล้างข้อมูลตรวจสอบทุกห้อง ทุกวันที่ · ต้องพิมพ์ข้อความยืนยันอีกครั้ง</small></span></button>
+ </div>
+</div></div>
+
+<div class="modal-back no-print" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="modal-box" style="max-width:440px">
+ <div class="modal-head"><h3 id="confirmTitle">ยืนยันการทำงาน</h3><button class="x" id="confirmXBtn" aria-label="ปิด" title="ปิด"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+ <div class="modal-body" style="line-height:1.8"><p id="confirmBody" style="white-space:pre-line;margin:0"></p><input type="text" id="confirmInput" class="field hidden" style="margin-top:12px"><p id="confirmInputHint" class="hidden" style="color:var(--bad);font-size:12px;margin:6px 0 0"></p></div>
+ <div class="modal-foot"><button class="btn" id="confirmCancelBtn">ยกเลิก</button><button class="btn btn-primary" id="confirmOkBtn">ยืนยัน</button></div>
+</div></div>
+
+<div id="toast" class="hidden no-print" role="status" aria-live="polite"></div>
+<div id="loadingOverlay" role="alertdialog" aria-live="polite" aria-label="กำลังสร้าง PDF"><div class="lbox"><div class="spinner"></div><h3>กำลังสร้าง PDF</h3><p>ระบบกำลังจัดรูปแบบเอกสาร กรุณารอสักครู่</p><div id="pdfProgressText">กำลังสร้างไฟล์ PDF กรุณารอสักครู่...</div><div class="track"><div class="fill" id="pdfFill"></div></div></div></div>
+
+<script>
+        const studentData = {
+            "4/8": [
+                "นายสุหรรษวัฒน์ สิงหศิริ", "นายบวรพจน์ มลต์สิงห์", "นายก้องกิตากร คงทัน", "นางสาวสายธาร บุญยะใบ", "นายสุทธิภัทร อ่อนวงษ์", 
+                "นางสาวสร้อยสุวรรณ ธุลี", "นายจีรเทพ ปรีชา", "นายธนกร พิโรจน์รัมย์", "นายนัธทวัฒน์ ช่างชัย", "นายสันสติ รัตนะวิชัย", 
+                "นายณัฐวัตร พลภักดี", "นายธนพงษ์ ลีสมโพช", "นายวัชรากร แสนยศ", "นางสาวเมษารัตน์ วันทานี", "นายกิตติพงษ์ บุตรดี", 
+                "นายธนธรน์ เชื้อพนม", "นายนันทวัฒน์ เพชร์แพง", "นายปรวีร์ มาตยาคุณ", "นายภัชรนันทร์ ชัยจันทา", "นางสาวพรไพลิน สินสิทธิ์", 
+                "นายธนวัฒน์ เชื้อพนม", "นางสาววันวิสา ทัศนัส", "นางสาวกานต์ธิดา อาจปริญ", "นายพชรพล พรมคุณ", "นายธนโชติ พิมภาสุด", 
+                "นายวีรเดช โพธิคำ", "นางสาวพัทธวรรณ บุญร่วม"
+            ],
+            "5/1": [
+                "นายปฐมพงษ์ มาตรสุริ", "นายศุภวิชญ์ เมืองจันทร์", "นายอิทธิกร นพเกตุ", "นางสาวจิรพร ศรีพุทธา", "นางสาวจิรัญญา สุกาวงค์", 
+                "นางสาวชนัญชิตา อัฟอักนิส", "นางสาวณัฐชยา โคมทอง", "นางสาวธนัญญา ดำเนิน", "นางสาวพิรดา อาษาจิตร", "นายเธียรชัย ศรีระบุตร", 
+                "นายนวภูวดล อำนาจ", "นายภูมิภัทร หวายฤทธิ์", "นายศิวกร พันธะ", "นางสาวชญานิศ ไชยขันธ์", "นางสาวนพธีรา ปัจฉิมบุตร", 
+                "นางสาวนิจวรีย์ ชัยเฉลิม", "นางสาวภัทรวดี ภวภูตานนท์", "นางสาวพิณภา นาทันลิ", "นายธีรวิทย์ วงวิราช", "นายพีรภัทร จิตกุศล", 
+                "นางสาวอัจฉราพร สว่างแสง", "นางสาวชลธิดา ฝาดภูธร", "นางสาวปราณณิชา อภิรมย์พงศ์ชัย", "นางสาววิชชุดา ภูกองทอง", "นายบรรณวิชญ์ ดอกคำแดง", 
+                "นายปกรณ์เกียรติ ชัยดี อูลริคเซ่น", "นายมนัสวิน บุตนนท์", "นางสาวกัญญาณัฐ ประวิเศษ", "นางสาวภัทรธิดา วิทวิบูรณ์", "นางสาวรุ่งนภา แก้วสมบัติ", 
+                "นางสาวอภัสรา รู้สึก", "นางสาวนัฐธิดา ชูเกณฑ์", "นายธนัตถ์ วงษ์ศรีลา", "นางสาวกรรณิกา พินทา", "นางสาวฐิตาพร บุญขันธ์", 
+                "นางสาวเนตรนภา งอกทรัพย์", "นายปฏิภาน ศรีวรษา", "นางสาววนิดา ประหุน", "นางสาวสิรภัทร ขันแก้ว"
+            ],
+            "5/2": [
+                "นายคณาธิป ภาโนมัย", "นายภูมิพัฒน์ นัคราพิบาล ภูมิศาสตร์", "นางสาวกรรณิกา ภูกองแก้ว", "นางสาวกฤตากานต์ ขันทะลี", "นางสาวพนัสชนก แซ่ตั้ง", 
+                "นายเจษฎาพร เเสไธสง", "นายพิชญะ พูลเพิ่ม", "นายองอาจ นาสะอ้าน", "นางสาวกิตติมาพร สอนแก้ว", "นางสาวณัฏฐ์วรินทร์ พงษ์สังข์", 
+                "นางสาวศรัญญา เพียรกล้า", "นางสาวฐิติรัตน์ ปัญจะรักษ์", "นางสาวพัชรภรณ์ เเป้นหมื่นไวย์", "นายธีรศักดิ์ วงวิราช", "นายนัทธพงศ์ เสนาภักดิ์", 
+                "นางสาวณัฐชนันท์ แสงจันทร์", "นายธนกฤต ภูมิดา", "นายอภิมงคล จันทร์แจ่มใส", "นายจิรพงค์ หาธรรมวงศ์", "นายศุภวิชญ์ สืบวงษ์", 
+                "นางสาวณัฐฐาพร จันทวี", "นางสาววรัญญา ละครรำ", "นางสาวภัทริดา ธงชัย", "นางสาววรัญญา ทินรัตน์", "นางสาวสุจิรา บุญเปรี่ยม", 
+                "นายวิชาญ ยอดคีรี", "นางสาวอนุธิดา ทองผา", "นายภคิน ไชยา", "นางสาวจุฑามาศ พลศรีดา", "นางสาวชนกนันท์ ไชยมี", 
+                "นางสาวดวงฤทัย ศรีกุล", "นางสาวปนัดดา แฝงเมืองคุก", "นายพีระวัฒน์ จือพิมาย", "นางสาวภัทรธิดา คำเพชร", "นางสาวรุ่งนภา แฝงเมืองคุก", 
+                "นางสาวศิริญากร ศิริโคตร", "นายสิทธิศักดิ์ อุ่นคำ", "นางสาวสุพิชญา สุริวรรณ"
+            ],
+            "5/3": [
+                "นางสาวขวัญจิรา หนองนา", "นางสาวพิชชาพร มาตพันนา", "นางสาวภัทรวดี บุญญาพิทักษ์", "นางสาวชญานิษฐ์ จันทร์โนนแซง", "นางสาวรพีพรรณ ขอบชัยแสง", 
+                "นางสาวสุตาภัทร ฉลาดเลิศ", "นายนฤนาท ศรีบุญเรือง", "นางสาวกิ่งแก้ว สุระมณี", "นางสาวพิชามญชุ์ ศรีบุญเรือง", "นางสาวอัญชนา สุนาอาจ", 
+                "นายจิระพัฒน์ จากคำภา", "นายนิรวิทย์ เวียงอินทร์", "นายภัทรดนัย คุณากร", "นางสาวชนากานต์ ทองบรรหา", "นางสาววรรณรัตน์ สมบูรณ์ธรรม", 
+                "นางสาวศศิประภา ประมูลสาร", "นางสาวณัฎฐา เเข็งขยัน", "นางสาวกรรณิการ์ ยี่โถ", "นางสาวพิยดา อามาตรมนตรี", "นายณัชพล พูลเพิ่ม", 
+                "นายกฤตภัค หลานวงค์", "นางสาวไปรยา บุญสงค์", "นางสาววาสนา แก้วชาตรี", "นายโภคิน คะสุวรรณ์", "นายกวิน ดวงสุข", 
+                "นางสาวกุลจิรา แซ่ฟุ้ง", "นางสาวพรนภา ชนชิต", "นายกรวิชญ์ ดอนวิจิตร", "นายทิชากร แก้วชิน", "นางสาวธัญชนิต หมื่นคำ", 
+                "นายธีรเมธ หัวดอน", "นายนโรดม อ่างทอง", "นายวัชรพงษ์ ชมภูสาร", "นางสาววัชราภรณ์ ชัยรินทร", "นางสาวอาทิตยา โชคลา", "นายศุภกฤต เชิงหอม"
+            ],
+            "5/4": [
+                "นางสาวปัณณพร เดชดี", "นายบุณยกร ปุระพรม", "นางสาวปณิดา มูลสันเทียะ", "นายทัชชกร อุ่นคำ", "นายธนากร สอนผา", 
+                "นายภูริพัฒน์ ราชสีห์", "นายอรรคเดช ชมสีแก้ว", "นางสาวนิญากร มุงคุณคำซาว", "นางสาวอริสรา คำสว่าง", "นางสาวณัฐชา แข็งขยัน", 
+                "นางสาวประภัศสร สุวรรณวงค์", "นางสาวเพชรดา เนาเเสง", "นางสาวสุภัสสร เชื้อท้าว", "นายณัฐพล ปุริตานัง", "นายนพรัตน์ ฤทธิ์ศรี", 
+                "นางสาวปริญญา เพชราชัย", "นางสาวลักษิกา พุทธา", "นางสาววไลวรรณ เพ็ชรดี", "นางสาววิชญาพร สร้อยโสม", "นายพีรพัฒน์ ศรีวิชัย", 
+                "นายชนกันต์ ภูแข่งศรี", "นางสาวกุศลิน หยงโสภา", "นางสาวชนิดาภา เลือกนารี", "นายสุชานันท บุตรดี", "นางสาวณัฐธิดา บุตนนท์", 
+                "นางสาวธนพร ทองหล่อ", "นายจิรบดี ก้อนศรี", "นายกรวิชญ์ จิตกองสี", "นายกฤติพงษ์ พานสมัน", "นายก้องภพ อ่อนสุระทุม", 
+                "นายจักรพงษ์ โพธิราช", "นางสาวปริตตา ปัคมา", "นางสาวพรณัฐชา สมภักดี", "นางสาวลลิตา กวนทา", "นายศิวกร ผิวเงิน", 
+                "นางสาวสิริธร กมลสินธุ์", "นายอานัสพล ลาดพันนา", "นายทัศไนย จดไว้", "นางสาวรินรดา ราชวงศ์"
+            ],
+            "5/5": [
+                "นางสาวพัทธ์ธีรา พลชัยยา", "นางสาวรสสุคนธ์ ศรีวกุล", "นางสาวถิรดา ฝ่ายสงค์", "นางสาวณัฐณิชา เพียรธัญกรณ์", "นางสาวรุจิราพร พรคำเดช", 
+                "นายขัตติย วารุกะ", "นายจักรินทร์ พินิจมนตรี", "นายปะติพาน โคตะรักษ์", "นายเกรียงไกร ทำเนาว์", "นายธนสิทธิ์ วะนาคำ", 
+                "นายอดิศักดิ์ เข็มอุทา", "นางสาวมณีรัตน์ บุญสวา", "นายจักรีเดช พลอยพุต", "นางสาวนภัสวรรณ เสนาวงษ์", "นายรุ่งรวิน อินสีดา", 
+                "นายวรณัฐ ชิมโพคลัง", "นางสาวปรายฟ้า นึกชอบ", "นางสาวสกาวเดือน กุบแก้ว", "นางสาวพิภัทรา พวงจำปี", "นายธนากร โสภาพล", 
+                "นายพรายแก้ว รูปหล่อ", "นายไพรพนา หงษ์ภูมี", "นายศิวากูล พรมวงษา", "นายสรรค์พงศ์ จิตรประดับศิลป์", "นางสาวกีรติกา คำควร", 
+                "นางสาวเบญญาภา คล่องธัญกรณ์", "นางสาวพรรณภัทร อาจเอี่ยม", "นางสาวชลิตา สาระผล", "นายณัชพล วันศรี", "นางสาวธนภรณ์ จันทร์หงษ์", 
+                "นางสาวนันทิกานต์ ทองแก้ว", "นางสาวนิราภร สมอาสา", "นางสาวพิชชาพร ทาวงค์", "นายพุฒิพงศ์ วงค์คำ", "นายวุฒิศักดิ์ ทานะศิล", "นายวศิน ทีหอคำ"
+            ],
+            "5/6": [
+                "นายสรวิศ อุดมลาภสมบัติ", "นางสาวปัญญาพร คุณโน", "นางสาวนันท์นภัส แว่นดำ", "นางสาวเกตมณี ปาปะเบา", "นางสาวทักษพร สีหานาม", 
+                "นายธนกฤต ฝาดภูธร", "นางสาวรวินท์นิภา นาแพง", "นายพรพิทักษ์ พลาจันทร์", "นางสาวนิธินันท์ นิ่งคลี", "นางสาวกมลชนก สุขนันทา", 
+                "นางสาวจิราวรรณ จันทร์ภูมิ", "นางสาวชฎาพร แมงไธสง", "นายชคราช โพธิภูมิ", "นายตันติกร สัตวงษ์", "นายธีรดนธ์ ต้นกันยา", 
+                "นายวิทวุฒิ ศรีทันเดช", "นางสาวพรรณิดา พรมทัศน์", "นางสาวนิชานัน ธาตะนะ", "นางสาวภัทรา อินเนียน", "นางสาวกิตติยาพร เงินพลับพลา", 
+                "นายธนัตถ์ ภารสุวรรณ", "นางสาวปภาวรินทร์ สินรัตน์", "นายพงศธร ดวงสุข", "นางสาวอนันตญา ลิม", "นายภูริทัต ทองลาด", "นายณัฐภัทร แพวประโคน"
+            ],
+            "5/7": [
+                "นายวสุ ศรีโมรส", "นางสาวสุวนันท์ พานทอง", "นางสาวชนาภา ตาลทับ", "นางสาวธิดารัตน์ สมสวัสดิ์", "นายสุวิจักขณ์ เเสงนวล", 
+                "นายธนันชัย สุรารักษ์", "นายธีรภัทร นาจันบุ", "นางสาวสโรชา ขอนยาง", "นายขจรศักดิ์ บุตรศรี", "นายกฤตเมธ สอนจูมมาตร", 
+                "นายณัฐวุติ ปัคคะมา", "นายนพรัตน์ ภูมิรัง", "นายพรภวิษย์ มั่นคง", "นายวัชรินทร์ อุลเว", "นายอภินันท์ หนันทะ", 
+                "นางสาวกนกพร ก้อนคำ", "นางสาวคณิศร โพธิเสน", "นางสาวพรกนก เพชรรักษา", "นายณัชพล เสนาฤทธิ์", "นางสาวธัญลักษณ์ เวสาลี", 
+                "นางสาวอารีรัตน์ โยธาคุณ", "นางสาวกัญชพร สูขะ", "นายกันต์ ศรีสอาด", "นายคุณาวุธ พุทธะขันธ์", "นายจิรพัฒน์ วงค์แก้ว", 
+                "นางสาวชุติมณฑน์ ผุยเพชรผุ้ย", "นายญาณาธิป คามบุตร", "นายติณณภพ บัณลิต", "นางสาวธารมารา อยู่เย็น", "นายนันทวัฒน์ ผิวพรรณ", 
+                "นายบุษราคัม ศรีวรษา", "นางสาวปิยธิดา จันทวี", "นายพุฒิชัย ยางสุด", "นางสาวรุ่งทิวา เหลาเงิน", "นางสาววรัญญา ศรีดี", 
+                "นางสาวสิริยากร สูงสันเขต", "นางสาวอารยา คำตะพันธ์"
+            ],
+            "5/8": [
+                "นายกรวิทย์ แก้วมะ", "นางสาวพรสุดา เถื่อนถานนท์", "นางสาววิชญาดา สุทธิประภา", "นายกิตติพงษ์ ชื่นศิริ", "นางสาวชุติกาญจน์ ดอนเหลา", 
+                "นางสาวสุปรียา ภูสีนาค", "นายอนุรักษ์ ศรีทะวงค์", "นางสาวขวัญฤทัย ศิริทอน", "นางสาวธนัชชา วงค์สมบูรณ์", "นายธนาธิป ชูชื่น", 
+                "นางสาวชนัญญา จันทะจิตร", "นางสาวธันญลักษณ์ วงค์ภูดอน", "นายก่อกุศล ศรีกุด", "นายก้องฟ้า ผาพรม", "นายธนกร สิทธิสาร", 
+                "นางสาวณัฐธิดา โง่นสา", "นางสาวนุสรา สอนเขียว", "นางสาวปุณยวีร์ เบ้าคันธี", "นางสาวสุกัญญา มาตรศรี", "นายณัฐวุติ เสี่ยงบุญ", 
+                "นายภูมิภัทร หัวดอน", "นายศุภณัฐ ดอนถวิล", "นางสาวชัญญานุช วิทนาวุฒิ", "นางสาวสุวิชาดา พอดี", "นางสาวมณีรัฏฐา อินทิ", 
+                "นายปริพัฒน์ ชารีพร", "นางสาวอินทิราภรณ์ ศรีเชียงสา", "นางสาวกัญญาภัค บำรุงเพชร", "นางสาวเพ็ญพิชชา ผุยเพ็ชปุ้ย", "นายจักรมินทร์ น่วมแม่", 
+                "นางสาวจิระนันท์ คำสว่าง", "นางสาวปาริตรา บุญหว่าน", "นางสาวปิยธิดา แก้วอุดม", "นางสาวภาวิตรา รูปคม", "นางสาวรุ่งฤดี ปิณะสา", "นายวุฒิชัย ขันอาษา"
+            ],
+            "5/9": [
+                "นายจักรชัย สุวรรณศรี", "นายณัฏฐวัจน์ ทาตา", "นายธนกฤต วรรณโสกเชือก", "นางสาวณัฏฐ์ชญา บุญประคม", "นางสาวปณิดา ชนชิต", 
+                "นางสาวสุวิชาดา ฝ่ายอากาศ", "นางสาวรมิตา วังซ้าย", "นางสาวอนุธิดา หวายฤทธิ์", "นางสาวธนัฏฐา หงษ์อุดร", "นางสาวสุพัตรา กาญจะนะรัตน์", 
+                "นายกาลครั้งหนึ่ง แสนไชย", "นายณัฐกานต์ จันทะวงษ์ศรี", "นายปัณณธร สว่างศรี", "นายภูธเนศ ทศภักดิ์", "นายสุเมธี คำเมืองคุณ", 
+                "นายอนุสรณ์ มุธาพร", "นางสาวจิตตรา ศรีเครือแก้ว", "นางสาวชุติมา วงษ์พิมล", "นางสาวชุติมาพร พรมจันทร์", "นางสาวณัชชา โพธิ์น้ำเที่ยง", 
+                "นางสาวนฤมล คำใบศรี", "นางสาวพิชญาภา สุทธิประภา", "นางสาวเมธาวินี พวงจำปา", "นางสาวศรีวรรณวิสา พิบูลย์", "นางสาวอภิรดี รื่นเริง", 
+                "นางสาวชุติมา ปัญญาสิทธิ์", "นายกฤษณะ ทาไธสงค์", "นางสาวนันทรัตน์ รัตนวงษ์", "นางสาวปภาวรินทร์ บุตรน้อย", "นางสาวพรชิตา ศรีชาทุม", 
+                "นางสาวยุพารัตน์ วงศ์ภูธร", "นางสาวรุ่งทิวา ชาพิมพ์", "นางสาววัชรี อับภัย", "นางสาวศศิวิมล อรุณดี"
+            ]
+        };
+
+        /* ---------- ค่าคงที่ ---------- */
+        const PART2_LABELS = [
+            "ตัวเครื่องภายนอกสมบูรณ์","หน้าจอแสดงผลชัดเจน","Touch Screen ตอบสนองปกติ","ปุ่มกด/เปิด-ปิด ใช้งานได้",
+            "ช่องเสียบชาร์จ/หูฟัง ใช้งานได้","แบตเตอรี่ชาร์จได้ปกติ","กล้องหน้า/หลัง ใช้งานได้","ระบบเสียง ใช้งานได้",
+            "เชื่อมต่อ WIFI ได้","ระบบปฏิบัติการสมบูรณ์"
+        ];
+        const PART3_LABELS = ["Adaptor","สายชาร์จ","ปากกา","คีย์บอร์ด","คู่มือ","กระเป๋า"];
+        const STORAGE_PREFIX = "pkp_device_check_";
+        const ROWS_PER_PDF_PAGE = 14;
+        const ROSTER_KEY = "pkp_roster_override";
+
+        /* ---------- รายชื่อนักเรียน (แก้ไข/เพิ่ม/ลบ ได้จากหน้าเว็บ) ---------- */
+        const DEFAULT_STUDENTS = JSON.parse(JSON.stringify(studentData));
+        let roster = JSON.parse(JSON.stringify(studentData));
+        try {
+            const ov = JSON.parse(localStorage.getItem(ROSTER_KEY) || '{}');
+            Object.keys(ov).forEach(k => { if (Array.isArray(ov[k])) roster[k] = ov[k]; });
+        } catch (e) {}
+        const saveRoster = () => {
+            const ov = {};
+            Object.keys(roster).forEach(k => {
+                if (JSON.stringify(roster[k]) !== JSON.stringify(DEFAULT_STUDENTS[k])) ov[k] = roster[k];
+            });
+            try { localStorage.setItem(ROSTER_KEY, JSON.stringify(ov)); } catch (e) {}
+        };
+
+        /* ---------- อ้างอิง element ---------- */
+        const classSelect = document.getElementById('classSelect');
+        const tableBody = document.getElementById('tableBody');
+        const printClass = document.getElementById('printClass');
+        const dateInput = document.getElementById('inspectionDate');
+        const printDate = document.getElementById('printDate');
+        const printModel = document.getElementById('printModel');
+        const modelEcho = document.getElementById('modelEcho');
+        const deviceModel = document.getElementById('deviceModel');
+        const inspectorName = document.getElementById('inspectorName');
+        const inspectorPosition = document.getElementById('inspectorPosition');
+        const generalNote = document.getElementById('generalNote');
+        const searchInput = document.getElementById('searchInput');
+        const filterSelect = document.getElementById('filterSelect');
+        const sortSelect = document.getElementById('sortSelect');
+
+        /* ---------- วันที่ ---------- */
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        const thaiDate = (v) => {
+            const d = new Date(v);
+            if (isNaN(d)) return '......../....../........';
+            return d.toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' });
+        };
+        printDate.textContent = thaiDate(today);
+        dateInput.addEventListener('change', (e) => {
+            dateInput.classList.remove('field-missing');
+            printDate.textContent = thaiDate(e.target.value);
+            loadData(true);
+        });
+
+        deviceModel.addEventListener('input', () => {
+            modelEcho.textContent = deviceModel.value || '-';
+            printModel.textContent = deviceModel.value || '-';
+        });
+
+        /* ---------- ลงนาม ---------- */
+        const syncSign = () => {
+            document.getElementById('signInspector').textContent = inspectorName.value || '........................................';
+            document.getElementById('signPosition').textContent = 'ตำแหน่ง ' + (inspectorPosition.value || '........................................');
+        };
+        inspectorName.addEventListener('input', syncSign);
+        inspectorPosition.addEventListener('input', syncSign);
+
+        /* ---------- Toast ---------- */
+        let toastTimer = null;
+        const showToast = (msg, color = '#4F46E5') => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = color;
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-animate');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { toast.classList.add('hidden'); toast.classList.remove('toast-animate'); }, 2800);
+        };
+
+        /* ---------- สร้างช่องติ๊ก (คลิกได้ทั้งช่อง) ---------- */
+        const createCheckboxes = (count, rowId, prefix) => {
+            let cols = '';
+            for (let i = 1; i <= count; i++) {
+                const id = `${prefix}-${rowId}-${i}`;
+                cols += `<td class="tick-cell">
+                            <label for="${id}"><input type="checkbox" id="${id}" class="${prefix}-${rowId}" data-row="${rowId}"></label>
+                         </td>`;
+            }
+            return cols;
+        };
+
+        /* ---------- ปุ่มในแถว ---------- */
+        window.checkAllRow = (rowId) => {
+            document.querySelectorAll(`.part2-${rowId}, .part3-${rowId}`).forEach(cb => cb.checked = true);
+            const passRadio = document.querySelector(`input[name="status_${rowId}"][value="pass"]`);
+            if (passRadio) passRadio.checked = true;
+            updateRowStyle(rowId);
+            updateSummary();
+            saveData(true);
+        };
+
+        window.clearRow = (rowId) => {
+            document.querySelectorAll(`.part2-${rowId}, .part3-${rowId}`).forEach(cb => cb.checked = false);
+            document.querySelectorAll(`input[name="status_${rowId}"]`).forEach(r => r.checked = false);
+            const tr = document.querySelector(`tr[data-row-id="${rowId}"]`);
+            if (tr) {
+                tr.querySelector('.sn-input').value = '';
+                tr.querySelector('.note-input').value = '';
+            }
+            updateRowStyle(rowId);
+            updateSummary();
+            saveData(true);
+        };
+
+        const updateRowStyle = (rowId) => {
+            const tr = document.querySelector(`tr[data-row-id="${rowId}"]`);
+            if (!tr) return;
+            const pass = document.querySelector(`input[name="status_${rowId}"][value="pass"]`);
+            const fail = document.querySelector(`input[name="status_${rowId}"][value="fail"]`);
+            tr.classList.remove('row-pass', 'row-fail');
+            if (pass && pass.checked) tr.classList.add('row-pass');
+            else if (fail && fail.checked) tr.classList.add('row-fail');
+        };
+
+        /* ---------- สรุปผล ---------- */
+        const updateSummary = () => {
+            const rows = document.querySelectorAll('tr[data-row-id]');
+            let pass = 0, fail = 0;
+            rows.forEach(tr => {
+                const id = tr.dataset.rowId;
+                if (document.querySelector(`input[name="status_${id}"][value="pass"]`)?.checked) pass++;
+                else if (document.querySelector(`input[name="status_${id}"][value="fail"]`)?.checked) fail++;
+            });
+            document.getElementById('statTotal').textContent = rows.length;
+            document.getElementById('statPass').textContent = pass;
+            document.getElementById('statFail').textContent = fail;
+            const pending = rows.length - pass - fail;
+            document.getElementById('statPending').textContent = pending;
+
+            const done = pass + fail;
+            document.getElementById('sbClass').textContent = classSelect.value ? ('ม.' + classSelect.value) : '-';
+            document.getElementById('sbDate').textContent = dateInput.value ? thaiDate(dateInput.value) : '-';
+            document.getElementById('sbProgress').textContent = `${done}/${rows.length}`;
+            const pct = rows.length ? Math.round((done / rows.length) * 100) : 0;
+            document.getElementById('sbFill').style.width = `${pct}%`;
+            const pctEl = document.getElementById('sbPercent');
+            if (pctEl) pctEl.textContent = `${pct}%`;
+            const remain = document.getElementById('sbRemain');
+            remain.textContent = rows.length ? (pending === 0 ? 'ตรวจครบทุกคนแล้ว' : `เหลืออีก ${pending} คน`) : 'ยังไม่ได้เลือกห้อง';
+            remain.style.color = (rows.length && pending === 0) ? '#10B981' : 'var(--warning)';
+        };
+
+        /* ---------- สร้างตาราง ---------- */
+        const renderTable = () => {
+            const selectedClass = classSelect.value;
+            printClass.textContent = selectedClass ? selectedClass : '____';
+
+            if (!selectedClass) {
+                tableBody.innerHTML = `<tr><td colspan="22" class="text-center p-8 text-gray-500">กรุณาเลือกห้องเรียนเพื่อโหลดรายชื่อนักเรียน</td></tr>`;
+                updateSummary();
+                return;
+            }
+
+            const students = roster[selectedClass] || [];
+            if (students.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="22" class="text-center p-8 text-red-600">ไม่พบรายชื่อนักเรียนห้อง ${selectedClass}</td></tr>`;
+                updateSummary();
+                return;
+            }
+
+            let html = '';
+            students.forEach((name, index) => {
+                const rowId = `r${index}`;
+                html += `
+                    <tr data-row-id="${rowId}" data-name="${name}">
+                        <td class="p-2 text-center sticky-col sticky-col-1">${index + 1}</td>
+                        <td class="p-2 whitespace-nowrap sticky-col sticky-col-2 font-medium">${name}</td>
+                        <td class="p-1">
+                            <input type="text" class="sn-input field text-xs" style="padding:5px 7px" placeholder="ระบุ SN">
+                        </td>
+                        ${createCheckboxes(10, rowId, 'part2')}
+                        ${createCheckboxes(6, rowId, 'part3')}
+                        <td class="tick-cell tick-pass">
+                            <label for="pass-${rowId}"><input type="radio" id="pass-${rowId}" name="status_${rowId}" value="pass"></label>
+                        </td>
+                        <td class="tick-cell tick-fail">
+                            <label for="fail-${rowId}"><input type="radio" id="fail-${rowId}" name="status_${rowId}" value="fail"></label>
+                        </td>
+                        <td class="p-1">
+                            <input type="text" class="note-input field text-xs" style="padding:5px 7px" placeholder="เช่น จอมีรอย / ไม่มีปากกา">
+                        </td>
+                        <td class="no-print"><div class="ra"><button type="button" onclick="checkAllRow('${rowId}')" class="btn btn-sm" title="ทำเครื่องหมายทุกช่องและกำหนดผล ผ่าน"><svg class="i" style="width:14px;height:14px" aria-hidden="true"><use href="#i-check"/></svg>ปกติทั้งหมด</button><button type="button" onclick="clearRow('${rowId}')" class="btn btn-sm" title="ล้างข้อมูลแถวนี้"><svg class="i" style="width:14px;height:14px" aria-hidden="true"><use href="#i-undo"/></svg>ล้าง</button></div></td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+            updateSummary();
+            applySearch();
+        };
+
+        classSelect.addEventListener('change', () => {
+            classSelect.classList.remove('field-missing');
+            filterSelect.value = 'all';
+            sortSelect.value = 'default';
+            renderTable();
+            loadData(true);
+        });
+
+        /* ---------- บันทึก / เรียกคืนข้อมูล ---------- */
+        const storageKey = () => `${STORAGE_PREFIX}${classSelect.value}_${dateInput.value}`;
+
+        const collectData = () => {
+            const rows = [];
+            document.querySelectorAll('tr[data-row-id]').forEach(tr => {
+                const id = tr.dataset.rowId;
+                rows.push({
+                    id,
+                    name: tr.dataset.name,
+                    sn: tr.querySelector('.sn-input').value,
+                    note: tr.querySelector('.note-input').value,
+                    part2: Array.from(document.querySelectorAll(`.part2-${id}`)).map(cb => cb.checked),
+                    part3: Array.from(document.querySelectorAll(`.part3-${id}`)).map(cb => cb.checked),
+                    status: document.querySelector(`input[name="status_${id}"][value="pass"]`)?.checked ? 'pass'
+                          : document.querySelector(`input[name="status_${id}"][value="fail"]`)?.checked ? 'fail' : ''
+                });
+            });
+            return {
+                classRoom: classSelect.value,
+                date: dateInput.value,
+                model: deviceModel.value,
+                inspector: inspectorName.value,
+                position: inspectorPosition.value,
+                generalNote: generalNote.value,
+                rows,
+                savedAt: new Date().toISOString()
+            };
+        };
+
+        const saveData = (silent) => {
+            if (!classSelect.value) {
+                if (!silent) showToast('กรุณาเลือกห้องเรียนก่อนบันทึก', '#F43F5E');
+                return;
+            }
+            try {
+                localStorage.setItem(storageKey(), JSON.stringify(collectData()));
+                if (!silent) showToast('บันทึกข้อมูลเรียบร้อยแล้ว', '#10B981');
+            } catch (e) {
+                if (!silent) showToast('ไม่สามารถบันทึกข้อมูลได้', '#F43F5E');
+            }
+        };
+
+        const loadData = (silent) => {
+            if (!classSelect.value) {
+                if (!silent) showToast('กรุณาเลือกห้องเรียนก่อน', '#F43F5E');
+                return;
+            }
+            let raw = null;
+            let storageBlocked = false;
+            try { raw = localStorage.getItem(storageKey()); } catch (e) { raw = null; storageBlocked = true; }
+            if (storageBlocked) {
+                if (!silent) showToast('เบราว์เซอร์บล็อกการเข้าถึงข้อมูลที่บันทึกไว้ (ลองเปิดไฟล์นี้ในแท็บเบราว์เซอร์โดยตรง)', '#F43F5E');
+                return;
+            }
+            if (!raw) {
+                if (!silent) showToast('ไม่พบข้อมูลที่บันทึกไว้ของห้อง/วันที่นี้', '#F59E0B');
+                return;
+            }
+            let data;
+            try {
+                data = JSON.parse(raw);
+            } catch (e) {
+                if (!silent) showToast('ข้อมูลที่บันทึกไว้เสียหาย ไม่สามารถเรียกคืนได้', '#F43F5E');
+                return;
+            }
+            deviceModel.value = data.model || deviceModel.value;
+            modelEcho.textContent = deviceModel.value;
+            printModel.textContent = deviceModel.value;
+            inspectorName.value = data.inspector || '';
+            inspectorPosition.value = data.position || '';
+            generalNote.value = data.generalNote || '';
+            syncSign();
+
+            (data.rows || []).forEach(r => {
+                const tr = document.querySelector(`tr[data-row-id="${r.id}"]`);
+                if (!tr) return;
+                tr.querySelector('.sn-input').value = r.sn || '';
+                tr.querySelector('.note-input').value = r.note || '';
+                document.querySelectorAll(`.part2-${r.id}`).forEach((cb, i) => cb.checked = !!(r.part2 || [])[i]);
+                document.querySelectorAll(`.part3-${r.id}`).forEach((cb, i) => cb.checked = !!(r.part3 || [])[i]);
+                if (r.status) {
+                    const el = document.querySelector(`input[name="status_${r.id}"][value="${r.status}"]`);
+                    if (el) el.checked = true;
+                }
+                updateRowStyle(r.id);
+            });
+            updateSummary();
+            if (!silent) showToast('เรียกคืนข้อมูลเรียบร้อยแล้ว', '#10B981');
+        };
+
+        /* ---------- บันทึกอัตโนมัติ ---------- */
+        document.addEventListener('input', (e) => {
+            if (e.target.closest('#inspectionTable') || ['generalNote','inspectorName','inspectorPosition','deviceModel'].includes(e.target.id)) {
+                saveData(true);
+            }
+        });
+        document.addEventListener('change', (e) => {
+            if (e.target.type === 'radio' || e.target.type === 'checkbox') {
+                const row = e.target.name?.replace('status_', '') || e.target.dataset.row;
+                if (row) updateRowStyle(row);
+                updateSummary();
+                saveData(true);
+            }
+        });
+
+        /* ---------- คลิกซ้ำที่ "ผ่าน/ไม่ผ่าน" เพื่อยกเลิกการเลือก ---------- */
+        document.addEventListener('click', (e) => {
+            const radio = e.target.closest('input[type="radio"]');
+            if (!radio) return;
+            if (radio.dataset.wasChecked === 'true') {
+                radio.checked = false;
+                radio.dataset.wasChecked = 'false';
+                const row = radio.name.replace('status_', '');
+                updateRowStyle(row);
+                updateSummary();
+                saveData(true);
+            }
+            document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
+                r.dataset.wasChecked = r.checked ? 'true' : 'false';
+            });
+        });
+
+        /* ---------- ค้นหา / กรอง / เรียงลำดับ ---------- */
+        const getRowStatus = (tr) => {
+            const id = tr.dataset.rowId;
+            if (document.querySelector(`input[name="status_${id}"][value="pass"]`)?.checked) return 'pass';
+            if (document.querySelector(`input[name="status_${id}"][value="fail"]`)?.checked) return 'fail';
+            return 'pending';
+        };
+
+        const applySearch = () => {
+            const q = searchInput.value.trim().toLowerCase();
+            const f = filterSelect.value;
+            document.querySelectorAll('tr[data-row-id]').forEach(tr => {
+                const name = (tr.dataset.name || '').toLowerCase();
+                const snVal = tr.querySelector('.sn-input')?.value || '';
+                const noteVal = tr.querySelector('.note-input')?.value || '';
+                const status = getRowStatus(tr);
+
+                const matchesQuery = !q || name.includes(q) || snVal.toLowerCase().includes(q);
+                let matchesFilter = true;
+                if (f === 'pass' || f === 'fail' || f === 'pending') matchesFilter = status === f;
+                else if (f === 'note') matchesFilter = noteVal.trim().length > 0;
+                else if (f === 'nosn') matchesFilter = snVal.trim().length === 0;
+
+                tr.style.display = (matchesQuery && matchesFilter) ? '' : 'none';
+            });
+        };
+        searchInput.addEventListener('input', applySearch);
+        filterSelect.addEventListener('change', applySearch);
+
+        const applySort = () => {
+            const mode = sortSelect.value;
+            if (mode === 'default') { renderTable(); return; }
+            const rows = Array.from(document.querySelectorAll('tr[data-row-id]'));
+            const statusRank = { fail: 0, pending: 1, pass: 2 };
+            rows.sort((a, b) => {
+                if (mode === 'name-asc') return (a.dataset.name || '').localeCompare(b.dataset.name || '', 'th');
+                if (mode === 'name-desc') return (b.dataset.name || '').localeCompare(a.dataset.name || '', 'th');
+                if (mode === 'status') return statusRank[getRowStatus(a)] - statusRank[getRowStatus(b)];
+                return 0;
+            });
+            rows.forEach(tr => tableBody.appendChild(tr));
+            applySearch();
+        };
+        sortSelect.addEventListener('change', applySort);
+
+        /* ---------- ปุ่มคำสั่ง ---------- */
+        document.getElementById('saveBtn').addEventListener('click', () => saveData(false));
+        document.getElementById('loadBtn').addEventListener('click', () => loadData(false));
+        document.getElementById('printBtn').addEventListener('click', () => {
+            // ซิงก์ข้อมูลหัวกระดาษก่อนพิมพ์ทุกครั้ง กันกรณีค่ายังไม่อัปเดต (เช่น เพิ่งพิมพ์ห้อง/วันที่/ยี่ห้อแล้วกดพิมพ์ทันที)
+            printClass.textContent = classSelect.value || '____';
+            printDate.textContent = dateInput.value ? thaiDate(dateInput.value) : '......../....../........';
+            printModel.textContent = deviceModel.value || '-';
+            if (!document.querySelectorAll('tr[data-row-id]').length) {
+                showToast('กรุณาเลือกห้องเรียนก่อนพิมพ์เอกสาร', '#F43F5E');
+                return;
+            }
+            try {
+                if (typeof window.print !== 'function') throw new Error('print unsupported');
+                window.print();
+            } catch (err) {
+                console.error('print failed', err);
+                showToast('เบราว์เซอร์บล็อกการพิมพ์ กรุณาใช้ปุ่ม "ดาวน์โหลด PDF" แทน', '#F43F5E');
+            }
+        });
+        document.getElementById('allPassBtn').addEventListener('click', async () => {
+            const rows = document.querySelectorAll('tr[data-row-id]');
+            if (!rows.length) return showToast('กรุณาเลือกห้องเรียนก่อน', '#F43F5E');
+            const ok = await customConfirm(`ต้องการกำหนดให้นักเรียนทุกคนในห้อง ม.${classSelect.value} (${rows.length} คน) เป็น "ปกติทั้งหมด / ผ่าน" ใช่หรือไม่?`, { okText: 'กำหนดปกติทั้งหมด' });
+            if (!ok) return;
+            rows.forEach(tr => checkAllRow(tr.dataset.rowId));
+            showToast('กำหนดผลเป็นปกติทั้งหมดแล้ว', '#10B981');
+        });
+        /* ---------- Modal ---------- */
+        window.openModal = (id) => document.getElementById(id).classList.add('show');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('show');
+        document.querySelectorAll('.modal-back').forEach(m => {
+            m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
+        });
+
+        /* ---------- กล่องยืนยัน/กรอกข้อความยืนยันแบบในหน้าเว็บ ----------
+           ใช้แทน window.confirm()/window.prompt() ของเบราว์เซอร์ เพราะสภาพแวดล้อมบางแบบ
+           (เช่น หน้าตัวอย่างแบบฝัง iframe) อาจบล็อกกล่องโต้ตอบของเบราว์เซอร์ ทำให้ปุ่มดูเหมือนไม่ทำงาน */
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmTitle = document.getElementById('confirmTitle');
+        const confirmBody = document.getElementById('confirmBody');
+        const confirmInput = document.getElementById('confirmInput');
+        const confirmInputHint = document.getElementById('confirmInputHint');
+        const confirmOkBtn = document.getElementById('confirmOkBtn');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        const confirmXBtn = document.getElementById('confirmXBtn');
+
+        const customConfirm = (message, opts = {}) => {
+            return new Promise((resolve) => {
+                confirmTitle.textContent = opts.title || 'ยืนยันการทำงาน';
+                confirmBody.textContent = message;
+                confirmInput.classList.add('hidden');
+                confirmInput.value = '';
+                confirmInputHint.classList.add('hidden');
+                confirmOkBtn.textContent = opts.okText || 'ยืนยัน';
+                confirmOkBtn.disabled = false;
+                confirmOkBtn.style.opacity = '1';
+
+                const cleanup = (result) => {
+                    confirmModal.classList.remove('show');
+                    confirmOkBtn.removeEventListener('click', onOk);
+                    confirmCancelBtn.removeEventListener('click', onCancel);
+                    confirmXBtn.removeEventListener('click', onCancel);
+                    resolve(result);
+                };
+                const onOk = () => cleanup(true);
+                const onCancel = () => cleanup(false);
+                confirmOkBtn.addEventListener('click', onOk);
+                confirmCancelBtn.addEventListener('click', onCancel);
+                confirmXBtn.addEventListener('click', onCancel);
+                confirmModal.classList.add('show');
+            });
+        };
+
+        const customPromptMatch = (message, matchText, hint) => {
+            return new Promise((resolve) => {
+                confirmTitle.textContent = 'ยืนยันการทำงาน';
+                confirmBody.textContent = message;
+                confirmInput.classList.remove('hidden');
+                confirmInput.value = '';
+                confirmInput.placeholder = matchText;
+                confirmInputHint.textContent = hint || `พิมพ์คำว่า "${matchText}" ให้ตรงทุกตัวอักษรเพื่อยืนยัน`;
+                confirmInputHint.classList.remove('hidden');
+                confirmOkBtn.textContent = 'ยืนยัน';
+                confirmOkBtn.disabled = true;
+                confirmOkBtn.style.opacity = '.5';
+
+                const checkMatch = () => {
+                    const ok = confirmInput.value === matchText;
+                    confirmOkBtn.disabled = !ok;
+                    confirmOkBtn.style.opacity = ok ? '1' : '.5';
+                };
+                confirmInput.addEventListener('input', checkMatch);
+
+                const cleanup = (result) => {
+                    confirmModal.classList.remove('show');
+                    confirmInput.removeEventListener('input', checkMatch);
+                    confirmOkBtn.removeEventListener('click', onOk);
+                    confirmCancelBtn.removeEventListener('click', onCancel);
+                    confirmXBtn.removeEventListener('click', onCancel);
+                    resolve(result);
+                };
+                const onOk = () => { if (confirmInput.value === matchText) cleanup(true); };
+                const onCancel = () => cleanup(false);
+                confirmOkBtn.addEventListener('click', onOk);
+                confirmCancelBtn.addEventListener('click', onCancel);
+                confirmXBtn.addEventListener('click', onCancel);
+                confirmModal.classList.add('show');
+                setTimeout(() => confirmInput.focus(), 50);
+            });
+        };
+
+        /* ---------- ล้างข้อมูล 3 ระดับ ---------- */
+        document.getElementById('clearBtn').addEventListener('click', () => openModal('clearModal'));
+
+        document.getElementById('clearRowsBtn').addEventListener('click', async () => {
+            const rows = document.querySelectorAll('tr[data-row-id]');
+            if (!rows.length) return showToast('ยังไม่ได้เลือกห้องเรียน', '#F43F5E');
+            const ok = await customConfirm(`ยืนยันล้างผลตรวจของห้อง ม.${classSelect.value} วันที่ ${thaiDate(dateInput.value)}\nข้อมูลของนักเรียน ${rows.length} คน จะถูกล้าง (ไม่กระทบวันที่อื่น)`);
+            if (!ok) return;
+            rows.forEach(tr => clearRow(tr.dataset.rowId));
+            generalNote.value = '';
+            saveData(true);
+            closeModal('clearModal');
+            showToast('ล้างผลตรวจของวันที่นี้เรียบร้อยแล้ว');
+        });
+
+        document.getElementById('clearClassBtn').addEventListener('click', async () => {
+            if (!classSelect.value) return showToast('ยังไม่ได้เลือกห้องเรียน', '#F43F5E');
+            const keys = Object.keys(localStorage).filter(k => k.startsWith(STORAGE_PREFIX + classSelect.value + '_'));
+            if (!keys.length) return showToast('ไม่พบข้อมูลที่บันทึกไว้ของห้องนี้', '#F59E0B');
+            const ok1 = await customConfirm(`ยืนยันลบข้อมูลที่บันทึกไว้ของห้อง ม.${classSelect.value} ทั้งหมด ${keys.length} ชุด (ทุกวันที่)\nการลบนี้ย้อนกลับไม่ได้`);
+            if (!ok1) return;
+            const ok2 = await customConfirm('ยืนยันอีกครั้ง: ต้องการลบข้อมูลทุกวันที่ของห้องนี้ใช่หรือไม่?');
+            if (!ok2) return;
+            keys.forEach(k => localStorage.removeItem(k));
+            document.querySelectorAll('tr[data-row-id]').forEach(tr => clearRow(tr.dataset.rowId));
+            generalNote.value = '';
+            closeModal('clearModal');
+            showToast(`ลบข้อมูลของห้อง ม.${classSelect.value} แล้ว ${keys.length} ชุด`);
+        });
+
+        document.getElementById('clearAllBtn').addEventListener('click', async () => {
+            const keys = Object.keys(localStorage).filter(k => k.startsWith(STORAGE_PREFIX));
+            if (!keys.length) return showToast('ไม่พบข้อมูลที่บันทึกไว้ในเครื่องนี้', '#F59E0B');
+            const ok = await customConfirm(`ยืนยันลบข้อมูลการตรวจสอบทั้งหมดในเครื่องนี้ จำนวน ${keys.length} ชุด (ทุกห้อง ทุกวันที่)\nรายชื่อนักเรียนจะไม่ถูกลบ`);
+            if (!ok) return;
+            const typed = await customPromptMatch('เพื่อความปลอดภัย กรุณาพิมพ์คำว่า "ลบทั้งหมด" เพื่อยืนยัน', 'ลบทั้งหมด');
+            if (!typed) {
+                return showToast('ยกเลิกการลบข้อมูล', '#F59E0B');
+            }
+            keys.forEach(k => localStorage.removeItem(k));
+            document.querySelectorAll('tr[data-row-id]').forEach(tr => clearRow(tr.dataset.rowId));
+            generalNote.value = '';
+            closeModal('clearModal');
+            showToast('ลบข้อมูลทั้งหมดเรียบร้อยแล้ว');
+        });
+
+        /* ---------- จัดการรายชื่อนักเรียน ---------- */
+        const renderStudentList = () => {
+            const cls = classSelect.value;
+            document.getElementById('smClass').textContent = cls ? ('ม.' + cls) : '-';
+            const box = document.getElementById('studentList');
+            const list = roster[cls] || [];
+            if (!list.length) {
+                box.innerHTML = '<div class="text-sm text-gray-500 py-4 text-center">ยังไม่มีรายชื่อในห้องนี้</div>';
+                return;
+            }
+            box.innerHTML = list.map((n, i) => `
+                <div class="student-row">
+                    <span class="no">${i + 1}.</span>
+                    <input type="text" class="field text-sm" value="${n.replace(/"/g, '&quot;')}" onchange="editStudent(${i}, this.value)">
+                    <button class="icon-btn" onclick="moveStudent(${i}, -1)" title="เลื่อนขึ้น" aria-label="เลื่อนขึ้น"><svg class="i" style="width:16px;height:16px" aria-hidden="true"><use href="#i-up"/></svg></button>
+                    <button class="icon-btn" onclick="moveStudent(${i}, 1)" title="เลื่อนลง" aria-label="เลื่อนลง"><svg class="i" style="width:16px;height:16px" aria-hidden="true"><use href="#i-down"/></svg></button>
+                    <button class="icon-btn del" onclick="removeStudent(${i})" title="ลบรายชื่อ" aria-label="ลบรายชื่อ"><svg class="i" style="width:16px;height:16px" aria-hidden="true"><use href="#i-trash"/></svg></button>
+                </div>`).join('');
+        };
+
+        const refreshAfterRosterChange = () => {
+            saveRoster();
+            renderStudentList();
+            renderTable();
+            loadData(true);
+        };
+
+        window.editStudent = (i, val) => {
+            const cls = classSelect.value;
+            const name = val.trim();
+            if (!name) return renderStudentList();
+            roster[cls][i] = name;
+            refreshAfterRosterChange();
+        };
+        window.removeStudent = async (i) => {
+            const cls = classSelect.value;
+            const ok = await customConfirm(`ยืนยันลบรายชื่อ "${roster[cls][i]}" ออกจากห้อง ม.${cls}?`);
+            if (!ok) return;
+            roster[cls].splice(i, 1);
+            refreshAfterRosterChange();
+            showToast('ลบรายชื่อเรียบร้อยแล้ว');
+        };
+        window.moveStudent = (i, dir) => {
+            const cls = classSelect.value;
+            const j = i + dir;
+            if (j < 0 || j >= roster[cls].length) return;
+            [roster[cls][i], roster[cls][j]] = [roster[cls][j], roster[cls][i]];
+            refreshAfterRosterChange();
+        };
+
+        document.getElementById('manageBtn').addEventListener('click', () => {
+            if (!classSelect.value) return showToast('กรุณาเลือกห้องเรียนก่อน', '#F43F5E');
+            renderStudentList();
+            openModal('studentModal');
+        });
+
+        document.getElementById('addStudentBtn').addEventListener('click', () => {
+            const input = document.getElementById('newStudentName');
+            const name = input.value.trim();
+            const cls = classSelect.value;
+            if (!name) return showToast('กรุณาพิมพ์ชื่อ - สกุล ก่อน', '#F43F5E');
+            roster[cls] = roster[cls] || [];
+            roster[cls].push(name);
+            input.value = '';
+            refreshAfterRosterChange();
+            showToast('เพิ่มรายชื่อเรียบร้อยแล้ว', '#10B981');
+        });
+        document.getElementById('newStudentName').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('addStudentBtn').click();
+        });
+
+        document.getElementById('resetStudentsBtn').addEventListener('click', async () => {
+            const cls = classSelect.value;
+            const ok = await customConfirm(`คืนค่ารายชื่อของห้อง ม.${cls} กลับเป็นรายชื่อตั้งต้นใช่หรือไม่?`);
+            if (!ok) return;
+            roster[cls] = JSON.parse(JSON.stringify(DEFAULT_STUDENTS[cls] || []));
+            refreshAfterRosterChange();
+            showToast('คืนค่ารายชื่อเรียบร้อยแล้ว');
+        });
+
+        /* ---------- ส่งออกไฟล์ (ดาวน์โหลดได้จริงทั้งในหน้า Artifact ของ Claude และเมื่อเปิดไฟล์นี้ตรงๆ ในเบราว์เซอร์) ---------- */
+        // วิธีที่ 1: ใช้ความสามารถ "downloads" ของแพลตฟอร์ม (จำเป็นเมื่อหน้านี้ถูกฝังแสดงผลแบบ Artifact)
+        let downloadsCapPromise = null;
+        const getDownloadsCap = () => {
+            if (!downloadsCapPromise) {
+                downloadsCapPromise = (async () => {
+                    try {
+                        if (window.claude && typeof window.claude.use === 'function') {
+                            return await window.claude.use('downloads');
+                        }
+                    } catch (e) {}
+                    return null;
+                })();
+            }
+            return downloadsCapPromise;
+        };
+        // วิธีที่ 2 (สำรอง): สร้างลิงก์ดาวน์โหลดโดยตรง — ใช้ได้เมื่อเปิดไฟล์นี้เป็นหน้าเว็บปกติ (ไม่ได้ฝังใน Artifact)
+        const legacyAnchorDownload = (blob, filename) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        };
+        /**
+         * เสนอไฟล์ให้ผู้ใช้บันทึก โดยลองใช้ความสามารถของแพลตฟอร์มก่อน แล้วค่อย fallback เป็นลิงก์ดาวน์โหลดตรง
+         * คืนค่า { ok, declined, via }
+         */
+        const offerDownload = async (filename, blobOrData) => {
+            try {
+                const downloads = await getDownloadsCap();
+                if (downloads) {
+                    const result = await downloads.save({ filename, data: blobOrData });
+                    return { ok: true, via: 'capability', status: result.status };
+                }
+            } catch (err) {
+                if (err && err.code === 'declined') return { ok: false, declined: true };
+                if (err && err.code === 'rate_limited') return { ok: false, rateLimited: true };
+                // ข้อผิดพลาดอื่นจากความสามารถของแพลตฟอร์ม: ลองสำรองด้วยลิงก์ดาวน์โหลดตรงต่อ
+            }
+            try {
+                const blob = blobOrData instanceof Blob ? blobOrData : new Blob([blobOrData]);
+                legacyAnchorDownload(blob, filename);
+                return { ok: true, via: 'legacy' };
+            } catch (e) {
+                return { ok: false, error: e };
+            }
+        };
+
+        /* ---------- ส่งออก Excel จริง (.xlsx) หลายชีต พร้อมจัดรูปแบบ ---------- */
+        const autoWidth = (rows) => {
+            // คำนวณความกว้างคอลัมน์จากความยาวข้อความจริง (หน่วยประมาณตัวอักษร)
+            const widths = [];
+            rows.forEach(row => {
+                row.forEach((cell, i) => {
+                    const len = String(cell ?? '').length;
+                    widths[i] = Math.max(widths[i] || 8, Math.min(len + 2, 40));
+                });
+            });
+            return widths.map(w => ({ wch: w }));
+        };
+
+        /* ---------- รอให้ตัวแปรไลบรารีจาก CDN (window[name]) พร้อมใช้งาน กันกรณีเน็ตช้า/สคริปต์ยังโหลดไม่เสร็จ ---------- */
+        const waitForGlobal = async (name, timeoutMs = 15000) => {
+            const start = Date.now();
+            while (typeof window[name] === 'undefined') {
+                if (Date.now() - start > timeoutMs) return false;
+                await new Promise(r => setTimeout(r, 150));
+            }
+            return true;
+        };
+
+        /* ---------- แสดงสถานะ "กำลังทำงาน" บนปุ่ม กันการกดซ้ำระหว่างสร้างไฟล์ ---------- */
+        const setBtnBusy = (btn, busy, busyLabel) => {
+            if (busy) {
+                btn._origHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="i" aria-hidden="true" style="animation:spin .9s linear infinite"><use href="#i-undo"/></svg>${busyLabel}`;
+            } else {
+                btn.disabled = false;
+                if (btn._origHtml) btn.innerHTML = btn._origHtml;
+            }
+        };
+
+        document.getElementById('csvBtn').addEventListener('click', async () => {
+            const data = collectData();
+            if (!data.rows.length) return showToast('ไม่มีข้อมูลสำหรับส่งออก', '#F43F5E');
+
+            const csvBtn = document.getElementById('csvBtn');
+            setBtnBusy(csvBtn, true, 'กำลังสร้างไฟล์...');
+            try {
+                if (typeof XLSX === 'undefined') {
+                    const ready = await waitForGlobal('XLSX');
+                    if (!ready) {
+                        showToast('ไม่สามารถโหลดไลบรารี Excel ได้ กรุณาตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่', '#F43F5E');
+                        return;
+                    }
+                }
+                const wb = XLSX.utils.book_new();
+                const passCount = data.rows.filter(r => r.status === 'pass').length;
+                const failCount = data.rows.filter(r => r.status === 'fail').length;
+                const pendingCount = data.rows.length - passCount - failCount;
+                const dateObj = data.date ? new Date(data.date + 'T00:00:00') : null;
+
+                /* Sheet 1: สรุปภาพรวม */
+                const s1 = [
+                    ['แบบฟอร์มตรวจสอบอุปกรณ์การเรียนการสอนออนไลน์'],
+                    ['โรงเรียนปากคาดพิทยาคม สํานักงานคณะกรรมการการศึกษาขั้นพื้นฐาน'],
+                    [],
+                    ['ห้องเรียน', data.classRoom ? `ม.${data.classRoom}` : '-'],
+                    ['วันที่ตรวจสอบ', dateObj || data.date || '-'],
+                    ['ผู้ตรวจสอบ', data.inspector || '-'],
+                    ['ตำแหน่ง', data.position || '-'],
+                    ['ยี่ห้อ/รุ่นอุปกรณ์', data.model || '-'],
+                    [],
+                    ['รายการ', 'จำนวน (คน)'],
+                    ['นักเรียนทั้งหมด', data.rows.length],
+                    ['ผ่าน / พร้อมใช้งาน', passCount],
+                    ['ไม่ผ่านการตรวจสอบ', failCount],
+                    ['ยังไม่ได้ตรวจ', pendingCount],
+                    [],
+                    ['หมายเหตุภาพรวม', data.generalNote || '-'],
+                ];
+                const ws1 = XLSX.utils.aoa_to_sheet(s1);
+                ws1['!cols'] = [{ wch: 22 }, { wch: 45 }];
+                ws1['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }];
+                if (dateObj) ws1['B5'].z = 'dd/mm/yyyy';
+                XLSX.utils.book_append_sheet(wb, ws1, 'สรุปภาพรวม');
+
+                /* Sheet 2: นักเรียน (ข้อมูลรายชื่อพื้นฐาน) */
+                const s2 = [['ลำดับ', 'ชื่อ - สกุล', 'Serial No.', 'ห้องเรียน']];
+                data.rows.forEach((r, i) => s2.push([i + 1, r.name, r.sn || '', data.classRoom ? `ม.${data.classRoom}` : '']));
+                const ws2 = XLSX.utils.aoa_to_sheet(s2);
+                ws2['!cols'] = autoWidth(s2);
+                ws2['!autofilter'] = { ref: `A1:D${s2.length}` };
+                ws2['!freeze'] = { xSplit: 0, ySplit: 1 };
+                XLSX.utils.book_append_sheet(wb, ws2, 'นักเรียน');
+
+                /* Sheet 3: ผลการตรวจสอบ */
+                const s3 = [['ลำดับ', 'ชื่อ - สกุล', 'Serial No.', 'ผลการตรวจสอบ', 'สถานะ (ตัวเลข)']];
+                data.rows.forEach((r, i) => s3.push([
+                    i + 1, r.name, r.sn || '',
+                    r.status === 'pass' ? 'ผ่าน / พร้อมใช้งาน' : r.status === 'fail' ? 'ไม่ผ่านการตรวจสอบ' : 'ยังไม่ได้ตรวจ',
+                    r.status === 'pass' ? 1 : r.status === 'fail' ? -1 : 0
+                ]));
+                const ws3 = XLSX.utils.aoa_to_sheet(s3);
+                ws3['!cols'] = autoWidth(s3);
+                ws3['!autofilter'] = { ref: `A1:E${s3.length}` };
+                ws3['!freeze'] = { xSplit: 0, ySplit: 1 };
+                XLSX.utils.book_append_sheet(wb, ws3, 'ผลตรวจสอบ');
+
+                /* Sheet 4: รายละเอียดอุปกรณ์ (checklist ครบทุกข้อ) */
+                const s4Header = ['ลำดับ', 'ชื่อ - สกุล', 'Serial No.',
+                    ...PART2_LABELS.map((l, i) => `${i + 1}. ${l}`),
+                    ...PART3_LABELS.map((l, i) => `อุปกรณ์ ${i + 1}. ${l}`)];
+                const s4 = [s4Header];
+                data.rows.forEach((r, i) => s4.push([
+                    i + 1, r.name, r.sn || '',
+                    ...r.part2.map(v => v ? 'ผ่าน' : ''),
+                    ...r.part3.map(v => v ? 'มี' : 'ไม่มี')
+                ]));
+                const ws4 = XLSX.utils.aoa_to_sheet(s4);
+                ws4['!cols'] = autoWidth(s4);
+                ws4['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: s4.length - 1, c: s4Header.length - 1 } }) };
+                ws4['!freeze'] = { xSplit: 3, ySplit: 1 };
+                XLSX.utils.book_append_sheet(wb, ws4, 'รายละเอียดอุปกรณ์');
+
+                /* Sheet 5: ปัญหา/หมายเหตุ (เฉพาะรายที่มีหมายเหตุ หรือไม่ผ่าน) */
+                const s5 = [['ลำดับ', 'ชื่อ - สกุล', 'Serial No.', 'ผลการตรวจสอบ', 'หมายเหตุ / ปัญหาที่พบ']];
+                data.rows.forEach((r, i) => {
+                    if (r.note && r.note.trim() || r.status === 'fail') {
+                        s5.push([i + 1, r.name, r.sn || '',
+                            r.status === 'pass' ? 'ผ่าน' : r.status === 'fail' ? 'ไม่ผ่าน' : 'ยังไม่ตรวจ',
+                            r.note || '']);
+                    }
+                });
+                if (s5.length === 1) s5.push(['-', 'ไม่พบปัญหาที่บันทึกไว้', '', '', '']);
+                const ws5 = XLSX.utils.aoa_to_sheet(s5);
+                ws5['!cols'] = autoWidth(s5);
+                ws5['!autofilter'] = { ref: `A1:E${s5.length}` };
+                ws5['!freeze'] = { xSplit: 0, ySplit: 1 };
+                Object.keys(ws5).forEach(k => { if (/^E\d+$/.test(k) && ws5[k]) ws5[k].s = { alignment: { wrapText: true } }; });
+                XLSX.utils.book_append_sheet(wb, ws5, 'ปัญหา-หมายเหตุ');
+
+                /* Sheet 6: ประวัติการตรวจ (จากข้อมูลที่บันทึกไว้ในเครื่องของห้องนี้ทุกวันที่) */
+                const s6 = [['ห้องเรียน', 'วันที่ตรวจสอบ', 'ผู้ตรวจสอบ', 'จำนวนทั้งหมด', 'ผ่าน', 'ไม่ผ่าน', 'ยังไม่ตรวจ', 'บันทึกล่าสุด']];
+                try {
+                    const keys = Object.keys(localStorage).filter(k => k.startsWith(STORAGE_PREFIX + data.classRoom + '_'));
+                    keys.sort().forEach(k => {
+                        try {
+                            const rec = JSON.parse(localStorage.getItem(k));
+                            const p = (rec.rows || []).filter(r => r.status === 'pass').length;
+                            const f = (rec.rows || []).filter(r => r.status === 'fail').length;
+                            const total = (rec.rows || []).length;
+                            s6.push([`ม.${rec.classRoom || data.classRoom}`, rec.date ? new Date(rec.date + 'T00:00:00') : '-',
+                                rec.inspector || '-', total, p, f, total - p - f,
+                                rec.savedAt ? new Date(rec.savedAt) : '-']);
+                        } catch (e) {}
+                    });
+                } catch (e) {}
+                if (s6.length === 1) s6.push(['-', '-', 'ไม่พบประวัติการบันทึกอื่นของห้องนี้ในเครื่องนี้', '', '', '', '', '']);
+                const ws6 = XLSX.utils.aoa_to_sheet(s6);
+                ws6['!cols'] = autoWidth(s6);
+                for (let r = 1; r < s6.length; r++) {
+                    const dcell = ws6[XLSX.utils.encode_cell({ r, c: 1 })];
+                    if (dcell && dcell.v instanceof Date) dcell.z = 'dd/mm/yyyy';
+                    const scell = ws6[XLSX.utils.encode_cell({ r, c: 7 })];
+                    if (scell && scell.v instanceof Date) scell.z = 'dd/mm/yyyy hh:mm';
+                }
+                ws6['!freeze'] = { xSplit: 0, ySplit: 1 };
+                XLSX.utils.book_append_sheet(wb, ws6, 'ประวัติการตรวจ');
+
+                const filename = `ตรวจสอบอุปกรณ์_ม.${(data.classRoom || '').replace('/', '-')}_${data.date}.xlsx`;
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true });
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const result = await offerDownload(filename, blob);
+                if (result.ok) {
+                    showToast('ดาวน์โหลดไฟล์ Excel (.xlsx) เรียบร้อยแล้ว', '#10B981');
+                } else if (result.declined) {
+                    showToast('ยกเลิกการบันทึกไฟล์ Excel', '#F59E0B');
+                } else if (result.rateLimited) {
+                    showToast('มีกล่องบันทึกไฟล์เปิดอยู่ กรุณาลองใหม่อีกครั้ง', '#F59E0B');
+                } else {
+                    showToast('ไม่สามารถบันทึกไฟล์ Excel ได้ กรุณาลองใหม่อีกครั้ง', '#F43F5E');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('สร้างไฟล์ Excel ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง', '#F43F5E');
+            } finally {
+                setBtnBusy(csvBtn, false);
+            }
+        });
+
+        /* ---------- สร้างหน้ากระดาษสำหรับ PDF (ทีละหน้า ไม่ตัดกลางบรรทัด) ---------- */
+        const buildPdfPage = (data, chunk, startIndex, pageNo, totalPages, isLast) => {
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'position:fixed;left:-20000px;top:0;width:1580px;background:#fff;padding:28px 30px;' +
+                "font-family:'Sarabun',sans-serif;color:#000;box-sizing:border-box;";
+
+            const mark = (v) => v ? '✔' : '';
+            const th = (t, extra = '') => `<th style="border:1px solid #374151;padding:5px 3px;font-size:12px;background:#EEF2FF;font-weight:600;line-height:1.3;${extra}">${t}</th>`;
+
+            const rowsHtml = chunk.map((r, i) => `
+                <tr>
+                    <td style="border:1px solid #374151;padding:6px 3px;text-align:center;font-size:13px;">${startIndex + i + 1}</td>
+                    <td style="border:1px solid #374151;padding:6px 8px;font-size:13px;white-space:nowrap;line-height:1.6;">${r.name}</td>
+                    <td style="border:1px solid #374151;padding:6px 6px;font-size:12px;">${r.sn || ''}</td>
+                    ${r.part2.map(v => `<td style="border:1px solid #374151;text-align:center;font-size:14px;">${mark(v)}</td>`).join('')}
+                    ${r.part3.map(v => `<td style="border:1px solid #374151;text-align:center;font-size:14px;">${mark(v)}</td>`).join('')}
+                    <td style="border:1px solid #374151;text-align:center;font-size:14px;">${r.status === 'pass' ? '✔' : ''}</td>
+                    <td style="border:1px solid #374151;text-align:center;font-size:14px;">${r.status === 'fail' ? '✔' : ''}</td>
+                    <td style="border:1px solid #374151;padding:6px;font-size:12px;">${r.note || ''}</td>
+                </tr>`).join('');
+
+            const passCount = data.rows.filter(r => r.status === 'pass').length;
+            const failCount = data.rows.filter(r => r.status === 'fail').length;
+
+            const footer = isLast ? `
+                <div style="margin-top:14px;font-size:14px;">หมายเหตุอื่น ๆ : ${data.generalNote ? data.generalNote.replace(/\n/g, '<br>') : '-'}</div>
+                <div style="display:flex;justify-content:space-around;margin-top:46px;text-align:center;font-size:14px;line-height:2;">
+                    <div>
+                        <div>ลงชื่อ ................................................ ผู้ตรวจสอบ</div>
+                        <div>( ${data.inspector || '................................................'} )</div>
+                        <div>ตำแหน่ง ${data.position || '................................................'}</div>
+                    </div>
+                    <div>
+                        <div>ลงชื่อ ................................................ ผู้รับรอง</div>
+                        <div>( ................................................ )</div>
+                        <div>ตำแหน่ง ผู้บริหารสถานศึกษา</div>
+                    </div>
+                </div>` : '';
+
+            wrap.innerHTML = `
+                <div style="text-align:center;font-family:'Noto Serif Thai','Sarabun',serif;">
+                    <div style="font-size:22px;font-weight:700;line-height:1.6;">แบบฟอร์มตรวจสอบอุปกรณ์การเรียนการสอนออนไลน์</div>
+                    <div style="font-size:17px;line-height:1.6;">โรงเรียนปากคาดพิทยาคม สํานักงานคณะกรรมการการศึกษาขั้นพื้นฐาน</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:14px;line-height:1.8;">
+                    <div>ส่วนที่ 1 : ข้อมูลอุปกรณ์ นักเรียนห้อง ม.${data.classRoom || '____'}</div>
+                    <div>วันที่ตรวจสอบ ${thaiDate(data.date)}</div>
+                    <div>หน้า ${pageNo} / ${totalPages}</div>
+                </div>
+                <div style="font-size:14px;line-height:1.8;">ยี่ห้อ/รุ่น : ${data.model || '-'} &nbsp;|&nbsp; นักเรียนทั้งหมด ${data.rows.length} คน | ผ่าน ${passCount} คน | ไม่ผ่าน ${failCount} คน | ยังไม่ตรวจ ${data.rows.length - passCount - failCount} คน</div>
+                <table style="width:100%;border-collapse:collapse;margin-top:8px;table-layout:auto;">
+                    <thead>
+                        <tr>
+                            ${th('ลำดับ', 'width:38px;')}
+                            ${th('ชื่อ - สกุล', 'width:210px;')}
+                            ${th('หมายเลขเครื่อง<br>(Serial No.)', 'width:110px;')}
+                            ${PART2_LABELS.map((l, i) => th(`${i + 1}. ${l}`, 'width:58px;')).join('')}
+                            ${PART3_LABELS.map((l, i) => th(`${i + 1}. ${l}`, 'width:52px;')).join('')}
+                            ${th('ผ่าน', 'width:48px;')}
+                            ${th('ไม่ผ่าน', 'width:48px;')}
+                            ${th('หมายเหตุ / ปัญหาที่พบ', 'width:170px;')}
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+                ${footer}
+            `;
+            return wrap;
+        };
+
+        /* ---------- รอให้ไลบรารี PDF โหลดเสร็จ (กันกรณีเน็ตช้า) ---------- */
+        const waitForLibs = async (timeoutMs = 15000) => {
+            const start = Date.now();
+            while (typeof window.html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+                if (Date.now() - start > timeoutMs) return false;
+                await new Promise(r => setTimeout(r, 150));
+            }
+            return true;
+        };
+
+        const setPdfProgress = (msg) => {
+            const el = document.getElementById('pdfProgressText');
+            if (el) el.textContent = msg;
+        };
+
+        /* ---------- ดาวน์โหลด PDF ---------- */
+        document.getElementById('pdfBtn').addEventListener('click', async () => {
+            const data = collectData();
+            classSelect.classList.toggle('field-missing', !classSelect.value);
+            dateInput.classList.toggle('field-missing', !dateInput.value);
+            if (!data.rows.length) return showToast('กรุณาเลือกห้องเรียนก่อนสร้าง PDF', '#F43F5E');
+
+            const pdfBtn = document.getElementById('pdfBtn');
+            setBtnBusy(pdfBtn, true, 'กำลังสร้าง PDF...');
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('show');
+            setPdfProgress('กำลังเตรียมไลบรารี...');
+            await new Promise(r => setTimeout(r, 60));
+
+            try {
+                const libsReady = await waitForLibs();
+                if (!libsReady || typeof window.html2canvas === 'undefined' || !window.jspdf) {
+                    throw new Error('PDF libraries failed to load');
+                }
+                if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+
+                const chunks = [];
+                for (let i = 0; i < data.rows.length; i += ROWS_PER_PDF_PAGE) {
+                    chunks.push(data.rows.slice(i, i + ROWS_PER_PDF_PAGE));
+                }
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+                const pageW = pdf.internal.pageSize.getWidth();
+                const pageH = pdf.internal.pageSize.getHeight();
+                const margin = 7;
+                const usableW = pageW - margin * 2;
+                const usableH = pageH - margin * 2;
+
+                for (let p = 0; p < chunks.length; p++) {
+                    setPdfProgress(`กำลังสร้างหน้า ${p + 1} จาก ${chunks.length}...`);
+                    const node = buildPdfPage(data, chunks[p], p * ROWS_PER_PDF_PAGE, p + 1, chunks.length, p === chunks.length - 1);
+                    document.body.appendChild(node);
+                    // บังคับให้เบราว์เซอร์คำนวณ layout ก่อนจับภาพ กันปัญหาความสูง/แถวไม่ครบ
+                    void node.offsetHeight;
+                    await new Promise(r => setTimeout(r, 120));
+
+                    let canvas;
+                    try {
+                        canvas = await html2canvas(node, {
+                            scale: 2,
+                            backgroundColor: '#ffffff',
+                            windowWidth: 1700,
+                            width: node.scrollWidth,
+                            height: node.scrollHeight,
+                            useCORS: true
+                        });
+                    } finally {
+                        node.remove();
+                    }
+
+                    if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                        throw new Error(`Failed to render page ${p + 1}`);
+                    }
+
+                    let w = usableW;
+                    let h = (canvas.height * w) / canvas.width;
+                    if (h > usableH) { h = usableH; w = (canvas.width * h) / canvas.height; }
+
+                    if (p > 0) pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin + (usableW - w) / 2, margin, w, h);
+                }
+
+                setPdfProgress('กำลังบันทึกไฟล์...');
+                const filename = `แบบฟอร์มตรวจสอบอุปกรณ์_ม.${(data.classRoom || '').replace('/', '-')}_${data.date}.pdf`;
+                const blob = pdf.output('blob');
+                const result = await offerDownload(filename, blob);
+                if (result.ok) {
+                    showToast('ดาวน์โหลดไฟล์ PDF เรียบร้อยแล้ว', '#10B981');
+                } else if (result.declined) {
+                    showToast('ยกเลิกการบันทึกไฟล์ PDF', '#F59E0B');
+                } else if (result.rateLimited) {
+                    showToast('มีกล่องบันทึกไฟล์เปิดอยู่ กรุณาลองใหม่อีกครั้ง', '#F59E0B');
+                } else {
+                    showToast('ไม่สามารถบันทึกไฟล์ PDF ได้ กรุณาลองใหม่อีกครั้ง', '#F43F5E');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('สร้าง PDF ไม่สำเร็จ กรุณาลองใหม่ หรือใช้ปุ่ม "พิมพ์เอกสาร" แทน', '#F43F5E');
+            } finally {
+                overlay.classList.remove('show');
+                setPdfProgress('กำลังสร้างไฟล์ PDF กรุณารอสักครู่...');
+                setBtnBusy(pdfBtn, false);
+            }
+        });
+
+        window.addEventListener('beforeunload', (e) => {
+            const rows = document.querySelectorAll('tr[data-row-id]');
+            if (!rows.length) return;
+            saveData(true);
+            const pending = parseInt(document.getElementById('statPending').textContent, 10) || 0;
+            if (pending > 0 && pending < rows.length) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        syncSign();
+        updateSummary();
+        const topnavDateEl = document.getElementById('topnavDate');
+        if (topnavDateEl) topnavDateEl.textContent = thaiDate(today);
+
+</script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id), side = $('side'), scrim = $('scrim');
+  const toggleSide = o => { side.classList.toggle('open', o); scrim.classList.toggle('hidden', !o); };
+  $('menuBtn').onclick = () => toggleSide(!side.classList.contains('open')); scrim.onclick = () => toggleSide(false);
+  const mb = $('moreBtn'), mp = $('morePop');
+  document.body.appendChild(mp); // ย้าย pop ออกจากภายใน .card ที่มี backdrop-filter (ซึ่งดักการซ้อนชั้นของ position:absolute ไว้ข้างใน ทำให้ลอยทับเนื้อหาอื่นไม่ได้จริง)
+  const popScrim = document.createElement('div');
+  popScrim.className = 'pop-scrim hidden no-print';
+  document.body.appendChild(popScrim);
+  const positionPop = () => {
+    const r = mb.getBoundingClientRect();
+    const w = mp.offsetWidth || 270, h = mp.offsetHeight || 0;
+    let left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+    let top = r.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6); // ไม่พอที่ข้างล่าง ให้โผล่ขึ้นข้างบนแทน
+    mp.style.left = left + 'px'; mp.style.top = top + 'px';
+  };
+  const closeMenu = () => { mp.hidden = true; mb.setAttribute('aria-expanded', 'false'); popScrim.classList.add('hidden'); };
+  mb.onclick = e => {
+    e.stopPropagation();
+    const opening = mp.hidden;
+    mp.hidden = !opening;
+    mb.setAttribute('aria-expanded', String(opening));
+    popScrim.classList.toggle('hidden', !opening);
+    if (opening) positionPop();
+  };
+  popScrim.onclick = () => closeMenu();
+  window.addEventListener('scroll', () => { if (!mp.hidden) closeMenu(); }, true);
+  window.addEventListener('resize', () => { if (!mp.hidden) positionPop(); });
+  mp.addEventListener('click', () => setTimeout(closeMenu));
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.menu') && !e.target.closest('#morePop')) closeMenu();
+    const n = e.target.closest('[data-go]');
+    if (n) {
+      e.preventDefault();
+      document.querySelectorAll('.nav a').forEach(a => a.removeAttribute('aria-current')); n.setAttribute('aria-current', 'true');
+      const t = n.dataset.go;
+      if (t === 'manage') $('manageBtn').click();
+      else { $(t).scrollIntoView({ behavior: 'smooth', block: 'start' }); const f = n.dataset.focus && $(n.dataset.focus); if (f) setTimeout(() => f.focus({ preventScroll: true }), 400); }
+      toggleSide(false);
+    }
+    const p = e.target.closest('[data-proxy]'); if (p) $(p.dataset.proxy).click();
+    if (e.target.matches('td.tick-cell')) e.target.querySelector('input')?.click();   // whole cell is clickable
+  });
+
+  /* search clear */
+  const si = $('searchInput'), sw = si.parentElement;
+  si.addEventListener('input', () => sw.classList.toggle('has', !!si.value));
+  $('searchClear').onclick = () => { si.value = ''; si.dispatchEvent(new Event('input', { bubbles: true })); si.focus(); };
+
+  /* status / progress mirrors (display only; values come from the original updateSummary) */
+  const au = $('autoSave'), auT = au.querySelector('span'); let last = '', timer;
+  const setA = (s, t) => { au.dataset.s = s; auT.textContent = t; };
+  const paint = () => $('classSelect').value ? setA('ok', last ? 'บันทึกอัตโนมัติแล้ว ' + last : 'บันทึกอัตโนมัติ') : setA('idle', 'ยังไม่ได้เลือกห้อง');
+  const sync = () => {
+    const n = id => +$(id).textContent || 0, t = n('statTotal'), p = n('statPass'), f = n('statFail'), pe = n('statPending'), done = t > 0 && pe === 0;
+    $('pcCount').textContent = `${p + f} / ${t} คน`; $('pcFill').style.width = $('sbFill').style.width;
+    $('pcRemain').textContent = $('sbRemain').textContent; $('pcPct').textContent = $('sbPercent').textContent;
+    $('pcBox').classList.toggle('done', done);
+    const c = $('classSelect').value; $('hdClass').textContent = c ? 'ม.' + c : 'ยังไม่ได้เลือกห้อง';
+    const st = $('sbStatus'); st.textContent = !t ? 'ยังไม่ได้เลือกห้อง' : done ? 'ตรวจครบทุกคนแล้ว' : 'กำลังดำเนินการ'; st.dataset.s = !t ? 'idle' : done ? 'done' : 'run';
+    $('sbStrip').classList.toggle('is-complete', done); paint();
+  };
+  const mo = new MutationObserver(sync);
+  ['statTotal', 'statPass', 'statFail', 'statPending', 'sbRemain', 'sbClass'].forEach(id => mo.observe($(id), { childList: true, characterData: true, subtree: true }));
+  ['classSelect', 'inspectionDate'].forEach(id => $(id).addEventListener('change', () => { last = ''; paint(); }));
+  const os = Storage.prototype.setItem;   // reflect real localStorage writes of inspection data
+  Storage.prototype.setItem = function (k, v) {
+    const mine = String(k).startsWith('pkp_device_check_'); if (mine) setA('saving', 'กำลังบันทึก...');
+    try { os.call(this, k, v); } catch (e) { if (mine) setA('err', 'บันทึกไม่สำเร็จ'); throw e; }
+    if (mine) { clearTimeout(timer); timer = setTimeout(() => { last = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }); paint(); }, 450); }
+  };
+  sync();
+
+  /* toast: type from the colour the original code passes */
+  const ts = $('toast');
+  new MutationObserver(() => {
+    const c = ts.style.backgroundColor.replace(/\s/g, '');
+    ts.dataset.t = c === 'rgb(16,185,129)' ? 'ok' : c === 'rgb(244,63,94)' ? 'err' : c === 'rgb(245,158,11)' ? 'warn' : 'info';
+    ts.classList.remove('toast-animate'); void ts.offsetWidth; ts.classList.add('toast-animate');
+  }).observe(ts, { childList: true });
+
+  /* PDF loading progress bar from "หน้า X จาก Y" */
+  const pt = $('pdfProgressText');
+  new MutationObserver(() => {
+    const t = pt.textContent, m = t.match(/หน้า (\d+) จาก (\d+)/);
+    $('pdfFill').style.width = m ? Math.round(((+m[1] - 1) / +m[2] + 0.5 / +m[2]) * 100) + '%' : /บันทึก/.test(t) ? '100%' : '8%';
+  }).observe(pt, { childList: true, characterData: true, subtree: true });
+
+  /* modals: focus, scroll lock, Esc, Tab trap, danger styling */
+  const modals = [...document.querySelectorAll('.modal-back')];
+  modals.forEach(m => new MutationObserver(() => {
+    if (m.classList.contains('show')) {
+      m._prev = document.activeElement;
+      if (m.id === 'confirmModal') $('confirmOkBtn').classList.toggle('danger-fill', /ลบ|ล้าง/.test($('confirmBody').textContent));
+      setTimeout(() => (m.querySelector('input:not(.hidden)') || m.querySelector('#confirmOkBtn,.btn-primary,.lvl'))?.focus(), 60);
+    } else m._prev?.focus?.();
+    document.body.style.overflow = modals.some(x => x.classList.contains('show')) ? 'hidden' : '';
+  }).observe(m, { attributes: true, attributeFilter: ['class'] }));
+  document.addEventListener('keydown', e => {
+    const m = [...modals].reverse().find(x => x.classList.contains('show'));
+    if (e.key === 'Escape') { closeMenu(); toggleSide(false); if (m) m.id === 'confirmModal' ? $('confirmCancelBtn').click() : m.classList.remove('show'); }
+    if (e.key === 'Tab' && m) {
+      const f = [...m.querySelectorAll('button,input,select,textarea')].filter(x => !x.disabled && x.offsetParent); if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f.at(-1).focus(); }
+      else if (!e.shiftKey && document.activeElement === f.at(-1)) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+
+  /* roster drawer search (filters the rendered list only) */
+  const sm = $('smSearch'), fl = () => { const v = sm.value.trim().toLowerCase(); document.querySelectorAll('#studentList .student-row').forEach(r => r.style.display = !v || r.querySelector('input').value.toLowerCase().includes(v) ? '' : 'none'); };
+  sm.addEventListener('input', fl); new MutationObserver(fl).observe($('studentList'), { childList: true });
+
+  /* accessible names + tooltips for generated checkbox cells */
+  const hs = [...document.querySelectorAll('#inspectionTable thead tr:nth-child(2) th')].map(t => t.textContent.trim().replace(/\s+/g, ' '));
+  new MutationObserver(() => document.querySelectorAll('#tableBody tr[data-row-id]').forEach(tr => {
+    if (tr.dataset.a) return; tr.dataset.a = 1;
+    [...tr.children].forEach((td, i) => { if (td.classList.contains('tick-cell')) { td.title = hs[i]; td.querySelector('input')?.setAttribute('aria-label', tr.dataset.name + ' — ' + hs[i]); } });
+  })).observe($('tableBody'), { childList: true });
+
+  /* hero device-health ring + scan status (decorative, mirrors real statTotal/Pass/Fail — never invents numbers) */
+  const heroRing = $('heroHealthRing'), heroPct = $('heroHealthPct'), heroScanLbl = $('heroScanLabel'), heroScanDot = $('heroScanDot');
+  if (heroRing) {
+    const dotStyle = { READY: ['#5B6484', 'none'], SCANNING: ['#38BDF8', '0 0 8px 1px #38BDF8'], COMPLETE: ['#22C55E', '0 0 8px 1px #22C55E'] };
+    const paintHero = () => {
+      const g = id => +($(id)?.textContent) || 0, t = g('statTotal'), p = g('statPass'), f = g('statFail'), checked = p + f;
+      const health = checked ? Math.round((p / checked) * 100) : (t ? 100 : 0);
+      heroRing.style.setProperty('--p', health);
+      heroPct.textContent = t ? health + '%' : '--%';
+      const label = !t ? 'READY' : checked >= t ? 'COMPLETE' : 'SCANNING';
+      heroScanLbl.textContent = label;
+      [heroScanDot.style.background, heroScanDot.style.boxShadow] = dotStyle[label];
+    };
+    ['statTotal', 'statPass', 'statFail'].forEach(id => new MutationObserver(paintHero).observe($(id), { childList: true, characterData: true, subtree: true }));
+    paintHero();
+  }
+})();
+</script>
+</body>
+</html>
